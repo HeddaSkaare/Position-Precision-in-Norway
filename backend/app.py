@@ -31,6 +31,8 @@ def satellites():
     
     is_processing = True
     list, df = runData(gnss, elevation_angle, time, epoch) 
+    #TODO: Legg funksjon som sjekker output fra runData mot terrengmodell her, og returnerer dataframe med id, tid, x,y,z ,azimuth og zenith
+    #Output fra funksjon skal brukes i best().
     DOPvalues = best(df)
     is_processing = False
     

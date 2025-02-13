@@ -519,7 +519,7 @@ def sortData(daynumber, date):
         print(f"Data on day {daynumber} already sorted")
         return
     else:
-        filename = f'backend/unzipped/BRD400DLR_S_2024{daynumber}0000_01D_MN.rnx'
+        filename = f'backend/unzipped/BRD400DLR_S_2025{daynumber}0000_01D_MN.rnx'
         lastned(daynumber)
         #current date
         current_date = date.date()
