@@ -8,7 +8,8 @@ from computebaner import runData
 #"python": "python -u",
 position = (7032447, 178496) # tuple of N, E
 latlon = (63.29589, 8.83329)
-
+#print(np.cos(120*np.pi/180))
+path ='DOM1_11-14_UTM33_20211217/33-'
 
 def UTMtilRastercelle(N,E):
 
@@ -24,14 +25,14 @@ def UTMtilRastercelle(N,E):
     sidelength = 15000
 
     N = N - bottom
-    E = E -left
+    E = E - left
     print(N,E)
     print(N//sidelength)
     print(E//sidelength)
 
     index_N += N//sidelength
     index_E += E//sidelength
-    filename = f'DOM1_11-14_UTM33_20211217/33-{int(index_E)}-{int(index_N)}.tif'
+    filename = f'{path}{int(index_E)}-{int(index_N)}.tif'
     index = (N-N//sidelength*sidelength,E-E//sidelength*sidelength)
     if index_N in indexboundsN and index_E in indexboundsE:
         return filename,index
@@ -52,9 +53,14 @@ def filterTerrain(df, position):
 
     filename, cell_index = UTMtilRastercelle(position[0],position[1])
 
+    epochs = []
+
     satellites = df
     for epoch in satellites:
+        sat_types = []
+
         for gnss_type in epoch:
+            sats = []
             for index, gnss in gnss_type.iterrows():
 
                 baseheight = data[cell_index[0],cell_index[1]]
@@ -63,8 +69,8 @@ def filterTerrain(df, position):
                 obsangle = 0
                 while obsangle < gnss['zenith']:
 
-                    cell_index[0]+=1
-                    cell_index[1]+=np.sin(angle)
+                    cell_index[0]+= np.cos(angle)
+                    cell_index[1]+= np.sin(angle)
                     height = data[int(cell_index[0]),int(cell_index[1])]
                     distance = np.sqrt(int(cell_index[0]-position[0])**2+int(cell_index[1]-position[1])**2)
                     obsangle = (height-baseheight)/distance
@@ -72,15 +78,14 @@ def filterTerrain(df, position):
                     if distance > 750:
                         #Satellite is visible
                         #add gnss to new dataframe
+                        sats.append(gnss)
                         obsangle = 90
+            sat_types.append(sats)
+        epochs.append(sat_types)
 
-
-                break
-            break
-        break
 
 
     #print(satellite)
-#print('hei')
-test = runData(['GPS', 'Galileo', 'GLONASS', 'BeiDou'], '10', '2025-02-12T12:00:00.000', 4)
-filterTerrain(test[1], position)
+
+#test = runData(['GPS', 'Galileo', 'GLONASS', 'BeiDou'], '10', '2025-02-12T12:00:00.000', 4)
+#filterTerrain(test[1], position)
