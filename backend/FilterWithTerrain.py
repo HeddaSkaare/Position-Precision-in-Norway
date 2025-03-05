@@ -121,13 +121,14 @@ def filterTerrain(df, position):
     print(distance_count)
     print(max_height)
     print(datetime.now()-starttime, 'time')
-    return epochs
+    return pd.DataFrame(epochs)
 
     #print(satellite)
 
 test = runData(['GPS'], '10', '2025-03-04T12:00:00.000', 1)
 result = filterTerrain(test[1], position)
 nono = 0
+print(result)
 for i in test[1]:
     for j in i:
         for k in j.iterrows():
