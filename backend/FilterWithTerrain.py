@@ -8,10 +8,78 @@ from computebaner import runData
 import rasterio
 from datetime import datetime
 #"python": "python -u",
-position = (7053759,173158) # tuple of N, E
+position = (173158,7053759) # tuple of E,N
 latlon = (63.29589, 8.83329)
 #print(np.cos(120*np.pi/180))
-path ='../DOM1_11-14_UTM33_20211217/33-'
+path ='DOM10_UTM33_20250228'
+
+# dataset = rasterio.open(f'DOM10_UTM33_20250228/6400_1_10m_z33.tif')
+# print(dataset.name)
+# print(dataset.bounds)
+
+# (49745.0,6500255)
+# print(N_cell,E_cell)
+
+#print(dataset.crs)
+#data = dataset.read(1)
+#print(data.shape)
+#print(data[5051])
+
+
+
+def UTMtilRaster2(E,N):
+    
+    sidelength = 50000 # 510 meters of overlap
+
+    oldN = N
+    oldE = E
+    
+
+    left = -255
+    bottom = 6399745
+    #print(E,N)
+    N -= bottom
+    E -= left
+
+    #print(E,N)
+
+    N_index = N//(sidelength*2)
+    E_index = E//(sidelength*2)
+    #print(E, type(E))
+
+    N -= N_index*(sidelength*2)
+    E -= E_index*(sidelength*2)
+    
+
+    if E > sidelength and N > sidelength:
+        quad = '1'
+    elif E > sidelength and N < sidelength:
+        quad = '2'
+    elif E < sidelength and N < sidelength:
+        quad = '3'
+    elif E < sidelength and N > sidelength:
+        quad = '4'
+    
+    N_index += 64
+    #print(N_index,E_index,quad)
+    #quad = int(quad,2)+1
+
+    
+
+    #print(N_index,E_index,quad)
+
+    if oldE < -255:
+        filename = f'{path}/{N_index}m1_{quad}_10m_z33.tif'
+    else:
+        filename = f'{path}/{N_index}{E_index:02d}_{quad}_10m_z33.tif'
+
+    #print(filename)
+    
+    
+
+    return filename
+
+print(UTMtilRaster2(7053759,173158))
 
 def UTMtilRastercelle(N,E):
 
@@ -54,36 +122,51 @@ def filterTerrain(df, position):
     print('FilterTerrain Start')
     elevation_mask = 10
 
-    filename, cell_index = UTMtilRastercelle(position[0],position[1])
-    print(cell_index,'cell index')
+    filename = UTMtilRaster2(position[0],position[1])
+    step_size = 5
+    #print(filename)
     dataset = rasterio.open(filename)
-    data = dataset.read(1)
+    N_start, E_start = dataset.index(position[0],position[1])
+    #print(N_cell,E_cell)
+    datas = []
+    datas.append(dataset.read(1))
     epochs = []
     distance_count = 0
+    angle_count = 0
     satellites = df
     max_height = 0
+    baseheight = datas[0][E_start][N_start]
     for epoch in satellites:
         sat_types = []
 
         for gnss_type in epoch:
             sats = []
             for index, gnss in gnss_type.iterrows():
-                N = position[0]
-                E = position[1]
-                N_cell = cell_index[1]
-                E_cell = cell_index[0]
+                
+                N = position[1]
+                E = position[0]
+                
+                data_index = 0
 
-                baseheight = data[E_cell][N_cell]
+                
                 #print(baseheight,'baseheight')
                 angle = ((gnss['azimuth']-90)%360)*np.pi/180
-                N_step = np.cos(angle)
-                E_step = np.sin(angle)
+                
+                N_step = np.cos(angle)*step_size
+                E_step = np.sin(angle)*step_size
                 #print(gnss['zenith'],'zenith',angle*180/np.pi)
                 obsangle = 0
+                #N_prev = N
+                #E_prev = E
+                distance = 0
+                data_index = 0
+
+                #N_cell_old = N_cell
+                #E_cell_old = E_cell
+
                 while obsangle < gnss['zenith']:
                     
-                    N_prev = N
-                    E_prev = E
+                    
                     N += N_step
                     E += E_step
 
@@ -91,35 +174,52 @@ def filterTerrain(df, position):
                        #N_cell += int(np.sign(N-position[0]))
                     #if int(E)%2 == 0:
                         #E_cell += int(np.sign(E-position[1]))
-                    N_cell += int(N)-int(N_prev)
-                    E_cell += int(E)-int(E_prev)
-
-                    if N_cell < 0 or N_cell > 15010 or E_cell < 0 or E_cell > 15010:
-                        print('Out of Raster bounds')
-                        break
+                    #N_cell = int((N-N_prev)/10)+N_cell_old
+                    #E_cell = int((E-E_prev)/10)+E_cell_old
+                    
+                    N_cell, E_cell = dataset.index(E,N)
+                    #print(N_cell,E_cell)
+                    if N_cell < 0 or N_cell >= 5051 or E_cell < 0 or E_cell >= 5051:
+                        #print('Out of Raster bounds')
+                        #print(E,N)
+                        #print(N_cell,E_cell)
+                        filename = UTMtilRaster2(int(E),int(N))
+                        #print(filename)
+                        dataset = rasterio.open(filename)
+                        #print(dataset.bounds)
+                        datas.append(dataset.read(1))
+                        N_cell, E_cell = dataset.index(E,N)
+                        #N_cell_old = N_cell
+                        #E_cell_old = E_cell
+                        #print(N_cell,E_cell)
+                        data_index = 1
+                        
 
                 
-                    height = data[E_cell][N_cell]
+                    height = datas[data_index][E_cell][N_cell]
                     #if height > max_height:
                     #    max_height = height
-                    distance = np.sqrt((N-position[0])**2+(E-position[1])**2)
-                    
+                    distance += step_size #np.sqrt((N-position[1])**2+(E-position[0])**2)
+                    #print(distance)
                     obsangle = np.arctan((height-baseheight)/distance)*180/np.pi
                     #if gnss['zenith'] < obsangle:
-                    #    print('hei')
-                    #    break
+                    #   angle_count += 1
                     #print(obsangle)
-                    if distance > 5000: # Distance in meters
+                    if abs(distance) > 5000: # Distance in meters
                         #Satellite is visible
                         #add gnss to new dataframe
+                        #print(distance)
                         distance_count += 1
                         sats.append(gnss)
                         obsangle = 90
                 #print(max_obsangle,'max obsangle')
+                #print('next satellite')
             sat_types.append(sats)
         epochs.append(sat_types)
-    print(distance_count)
-    print(max_height)
+    print(distance_count,'distance count')
+    #print(angle_count,'angle count')
+    #print(max_height)
+    print('FilterTerrain End')
     print(datetime.now()-starttime, 'time')
     return pd.DataFrame(epochs)
 
@@ -130,8 +230,11 @@ result = filterTerrain(test[1], position)
 nono = 0
 print(result)
 for i in test[1]:
-    for j in i:
-        for k in j.iterrows():
-            nono += 1
-print(nono)
+   for j in i:
+       for k in j.iterrows():
+           nono += 1
+print(nono,'nono')
 #print(test[1])
+
+
+# Med index 0:00:08.656879 time

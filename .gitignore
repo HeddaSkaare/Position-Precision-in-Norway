@@ -4,4 +4,5 @@ backend/unzipped/
 backend/DataFrames/
 .DS_Store
 data/
-
+.venv
+DOM10_UTM33_20250228/
