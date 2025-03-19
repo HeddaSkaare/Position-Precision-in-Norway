@@ -5,6 +5,7 @@ from computebaner import  runData
 from computeDOP import best
 from flask_cors import CORS
 from datetime import datetime
+from FilterWithTerrain import filterTerrain
 
 # Set up basic configuration for logging
 #logging.basicConfig(level=logging.INFO)
@@ -33,6 +34,7 @@ def satellites():
     list, df = runData(gnss, elevation_angle, time, epoch) 
     #TODO: Legg funksjon som sjekker output fra runData mot terrengmodell her, og returnerer dataframe med id, tid, x,y,z ,azimuth og zenith
     #Output fra funksjon skal brukes i best().
+    df = filterTerrain(df)
     DOPvalues = best(df)
     is_processing = False
     

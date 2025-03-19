@@ -8,8 +8,8 @@ from computebaner import runData
 import rasterio
 from datetime import datetime
 #"python": "python -u",
-position = (173158,7053759) # tuple of E,N
-latlon = (63.29589, 8.83329)
+#position = (173158,7053759) # tuple of E,N
+#latlon = (63.29589, 8.83329)
 #print(np.cos(120*np.pi/180))
 path ='DOM10_UTM33_20250228'
 
@@ -214,26 +214,28 @@ def filterTerrain(df, position):
                         obsangle = 90
                 #print(max_obsangle,'max obsangle')
                 #print('next satellite')
+            sats = pd.DataFrame(sats,columns=['Satelitenumber', 'time', 'X','Y','Z','azimuth', 'zenith'])
             sat_types.append(sats)
+        #sat_types = pd.DataFrame(sat_types)
         epochs.append(sat_types)
     print(distance_count,'distance count')
     #print(angle_count,'angle count')
     #print(max_height)
     print('FilterTerrain End')
     print(datetime.now()-starttime, 'time')
-    return pd.DataFrame(epochs)
+    return epochs
 
     #print(satellite)
 
-test = runData(['GPS'], '10', '2025-03-04T12:00:00.000', 1)
-result = filterTerrain(test[1], position)
-nono = 0
-print(result)
-for i in test[1]:
-   for j in i:
-       for k in j.iterrows():
-           nono += 1
-print(nono,'nono')
+#test = runData(['GPS','Galileo'], '10', '2025-03-04T12:00:00.000', 1)
+#result = filterTerrain(test[1], position)
+#nono = 0
+#print(result)
+# for i in test[1]:
+#    for j in i:
+#        for k in j.iterrows():
+#            print(k)
+#print(nono,'nono')
 #print(test[1])
 
 
