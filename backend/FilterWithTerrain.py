@@ -27,7 +27,7 @@ path ='DOM10_UTM33_20250228'
 
 
 
-def UTMtilRaster2(E,N):
+def UTMtilRaster(E,N):
     
     sidelength = 50000 # 510 meters of overlap
 
@@ -79,8 +79,7 @@ def UTMtilRaster2(E,N):
 
     return filename
 
-print(UTMtilRaster2(7053759,173158))
-
+"""
 def UTMtilRastercelle(N,E):
 
     indexboundsN = range(140,145)
@@ -109,7 +108,7 @@ def UTMtilRastercelle(N,E):
     else:
         raise Exception('Index out of bounds, no tif file for these UTM coordinates')
 
-
+"""
 
 def filterTerrain(df, position):
 
@@ -122,7 +121,7 @@ def filterTerrain(df, position):
     print('FilterTerrain Start')
     elevation_mask = 10
 
-    filename = UTMtilRaster2(position[0],position[1])
+    filename = UTMtilRaster(position[0],position[1])
     step_size = 5
     #print(filename)
     dataset = rasterio.open(filename)
@@ -183,7 +182,7 @@ def filterTerrain(df, position):
                         #print('Out of Raster bounds')
                         #print(E,N)
                         #print(N_cell,E_cell)
-                        filename = UTMtilRaster2(int(E),int(N))
+                        filename = UTMtilRaster(int(E),int(N))
                         #print(filename)
                         dataset = rasterio.open(filename)
                         #print(dataset.bounds)
