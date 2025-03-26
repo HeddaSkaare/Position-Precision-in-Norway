@@ -532,9 +532,15 @@ def sortData(daynumber, date):
         structured_dataI = pd.DataFrame(columns = columnsI) 
         structured_dataS = pd.DataFrame(columns = columnsS)
         content = []
-        with open(filename, "r") as file:
-            print(f"Reading file {filename}")
-            content = file.read()
+        try:
+            with open(filename, "r") as file:
+                print(f"Reading file {filename}")
+                content = file.read()
+        except:
+            filename = 'backend/'+filename
+            with open(filename, "r") as file:
+                print(f"Reading file {filename}")
+                content = file.read()
 
         split_index = content.index("END OF HEADER")
         header_part = content[:split_index] # baneinformasjon
