@@ -119,7 +119,7 @@ def filterTerrain(df, position):
                     E += E_step
                     
                     N_cell, E_cell = dataset.index(E,N)
-                    
+
                     if N_cell < 0 or N_cell >= 5051 or E_cell < 0 or E_cell >= 5051:
                         filename = UTMtilRaster(int(E),int(N))
                         dataset = rasterio.open(filename)
@@ -145,11 +145,11 @@ def filterTerrain(df, position):
 
     #print(satellite)
 
-#test = runData(['GPS','Galileo'], '10', '2025-03-25T08:00:00.000', 0)
-#result = filterTerrain(test[1], position)
+test = runData(['GPS','Galileo'], '10', '2025-03-22T08:00:00.000', 0)
+result = filterTerrain(test[1], position)
 #nono = 0
-#print(result)
-#print(test[1])
+print(result)
+print(test[1])
 # for i in test[1]:
 #    for j in i:
 #        for k in j.iterrows():

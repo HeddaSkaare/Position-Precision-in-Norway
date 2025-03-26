@@ -537,8 +537,7 @@ def sortData(daynumber, date):
                 print(f"Reading file {filename}")
                 content = file.read()
         except:
-            filename = 'backend/'+filename
-            with open(filename, "r") as file:
+            with open('backend/'+filename, "r") as file:
                 print(f"Reading file {filename}")
                 content = file.read()
 

@@ -2,9 +2,10 @@ import requests
 import gzip
 import os
 # day = 317
-folder ='unzipped/'
 
 def lastned(day):
+    folder ='unzipped/'
+
     print(day)
     filename = f'BRD400DLR_S_2025{day}0000_01D_MN.rnx.gz'
 
