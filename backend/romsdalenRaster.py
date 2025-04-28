@@ -1,6 +1,5 @@
 import math
 import numpy as np
-import rasterio
 import math
 import rasterio
 from rasterio.mask import mask
