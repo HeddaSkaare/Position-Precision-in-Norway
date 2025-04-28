@@ -109,20 +109,24 @@ res = []
 for key, value in data.items():
     
     count += 1
-    if count == 95:
-        print('hei')
+    if count%100 == 0:
+        #print('hei')
         vis_sat_df = runData_check_sight(gnss, 0, '2025-03-30T'+str(key)+'.000', 0, [value[2],value[1]])[1]
         tida.append(value[-1])
         #print(value[2],value[1],'hallo')
         res.append(sum(len(vis_sat_df[0][i]) for i in range(len(vis_sat_df[0]))))
         exp.append(sum(value[4]))
+        #print(res,exp)
         # for i in range(len(vis_sat_df[0])):
         #     print(len(vis_sat_df[0][i]),value[4][i])
         # #print(vis_sat_df)
         # print(value[3])
         # print('---------------------------------------------------------------')
+#print(runData_check_sight(gnss, 0, '2025-03-30T'+str(key)+'.000', 0, [7.6976858333, 62.5347858333])[1])
 plt.plot(tida,res,label='Expected satellites')
 plt.plot(tida,exp,label='Visible satellites')
+plt.legend()
+plt.show()
         
 #vis_sat_df = runData_no_terrain(gnss, 0, '2025-03-30T10:46:46.000', 0, [7.6976858333, 62.5347858333],46)[1]
 #print(vis_sat_df)
