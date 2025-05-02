@@ -15,6 +15,9 @@ Flask-Cors==5.0.0
 folium==0.19.4
 fonttools==4.55.3
 geopandas==1.0.1
+gnsstoolbox==1.2.21
+gpsdatetime==1.0.45
+gunicorn==23.0.0
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.5
@@ -26,11 +29,14 @@ nvdbapi-v3==1.0.0
 packaging==24.2
 pandas==2.2.3
 pillow==11.1.0
+pynmeagps==1.0.48
 pyogrio==0.10.0
 pyparsing==3.2.1
 pyproj==3.7.0
+pyrtcm==1.1.5
 python-dateutil==2.9.0.post0
 pytz==2024.2
+pyubx2==1.2.50
 rasterio==1.4.3
 requests==2.32.3
 shapely==2.0.6
