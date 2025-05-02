@@ -229,12 +229,12 @@ def get_road_api(startpoint, sluttpoint, vegsystemreferanse):
         connected_utm = connect_road(total_vegsegment_utm)
         connected_wgs = connect_road(total_vegsegment_wgs84)
 
-        # Delete merged raster if exists
-        print('lager raster')
-        if os.path.exists("data/merged_raster.tif"):
-            os.remove("data/merged_raster.tif")
-        createNewRaster(startpoint, sluttpoint)
-        print('utav lager raster')
+        # Delete merged raster if exists(detet er bare for local host, da vi ikke kan ha store filer i minne)
+        # print('lager raster')
+        # if os.path.exists("data/merged_raster.tif"):
+        #     os.remove("data/merged_raster.tif")
+        # createNewRaster(startpoint, sluttpoint)
+        # print('utav lager raster')
 
         return connected_utm, connected_wgs
 
