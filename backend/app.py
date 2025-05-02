@@ -1,4 +1,5 @@
 import json
+import os
 from flask import Flask, Response, jsonify, request, stream_with_context
 from computebaner import  get_gnss, getDayNumber, runData_check_sight
 from computeDOP import best, find_dop_on_point
@@ -10,6 +11,7 @@ import rasterio
 
 distance = None
 points = None
+port = int(os.environ.get("PORT", 5000))
 
 app = Flask(__name__)
 # CORS(app, resources={r"/satellites": {"origins": "http://localhost:3000"}}, supports_credentials=True)
@@ -158,4 +160,4 @@ def dopValues():
 
 
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=port, debug=True)
