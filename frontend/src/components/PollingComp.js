@@ -8,7 +8,7 @@ const PollingComponent = () => {
 
   // Function to check if data is ready
   const pollData = () => {
-    axios.get('http://127.0.0.1:5000/satellites')
+    axios.get('https://position-precision-in-norway.onrender.com/satellites')
       .then(response => {
         if (response.data && response.data.data) {
           setData(response.data.data);  

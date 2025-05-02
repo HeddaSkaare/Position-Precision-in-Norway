@@ -115,7 +115,7 @@ const NavMap = () => {
     console.log("startPoint", startPoint);
     console.log("endPoint", endPoint);
   
-    fetch('http://127.0.0.1:5000/road', {
+    fetch('https://position-precision-in-norway.onrender.com/road', {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

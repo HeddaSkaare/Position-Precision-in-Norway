@@ -97,7 +97,7 @@ const Visualization = () => {
       const filteredGNSS = Object.keys(gnssNames).filter((key) => gnssNames[key]);
       const searchPoint = points[cosenPoint].geometry.coordinates;
 
-      fetch('http://127.0.0.1:5000/satellites', {
+      fetch('https://position-precision-in-norway.onrender.com/satellites', {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
