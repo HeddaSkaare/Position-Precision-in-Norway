@@ -22,7 +22,7 @@ def satellites():
     if request.method == 'OPTIONS':
         # Handle the preflight request with necessary headers
         response = jsonify({'status': 'Preflight request passed'})
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
         response.headers.add("Access-Control-Allow-Headers", "Content-Type")
         response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
         return response, 200
@@ -46,11 +46,11 @@ def satellites():
     
     if not is_processing:
         response = jsonify({'message': 'Data processed successfully', 'data': list, 'DOP': DOPvalues,   'elevation_cutoffs': elevation_strings})
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")  
+        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*")) 
         return response, 200
     else:
         response = jsonify({"data": "Data is not ready"})
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")  
+        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
         return response, 202
 
 
@@ -62,7 +62,7 @@ def road():
     if request.method == 'OPTIONS':
         # Handle the preflight request (CORS preflight)
         response = jsonify({'status': 'Preflight request passed'})
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
         response.headers.add("Access-Control-Allow-Headers", "Content-Type")
         response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
         return response, 200
@@ -76,7 +76,7 @@ def road():
         # Validate input
         if not vegReferanse or not startPoint or not endPoint or not distance:
             response = jsonify({'error': 'Missing input parameters.', 'message': 'Please provide startPoint, endPoint, distance and vegReferanse.'})
-            response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+            response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
             return response, 400
 
         # Get road data
@@ -86,7 +86,7 @@ def road():
         points = calculate_travel_time(road_utm, float(distance))
 
         response = jsonify({'message': 'Data processed successfully', 'road': road_wgs, 'points': points})
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
         return response, 200
 
     except IndexError as e:
@@ -95,7 +95,7 @@ def road():
             'details': str(e),
             'message': 'The road couldn’t be found. Please check all the input parameters and be more specific with the start and end markers.'
         })
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
         return response, 400
 
     except Exception as e:
@@ -106,7 +106,7 @@ def road():
             'details': str(e),
             'message': 'An unexpected error occurred. Please try again later.'
         })
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
         return response, 500
 
     
@@ -115,7 +115,7 @@ def road():
 def dopValues():
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'Preflight request passed'})
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
         response.headers.add("Access-Control-Allow-Headers", "Content-Type, Cache-Control")
         response.headers.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         return response, 200
@@ -153,7 +153,7 @@ def dopValues():
         yield f"{json.dumps(dop_list)}\n\n"
 
     response = Response(stream_with_context(generate()), content_type='text/event-stream')
-    response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+    response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
     return response
 
 
