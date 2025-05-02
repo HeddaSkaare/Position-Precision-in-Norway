@@ -14,7 +14,7 @@ points = None
 app = Flask(__name__)
 # CORS(app, resources={r"/satellites": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 # CORS(app, resources={r"/dopvalues": {"origins": "http://localhost:3000"}})
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "https://master-thesis-dop-2025.vercel.app/"]}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "https://master-thesis-dop-2025.vercel.app"]}})
 
 
 @app.route('/satellites', methods=['POST', 'OPTIONS'])

@@ -5,6 +5,9 @@ backend/DataFrames/
 .DS_Store
 backend/data/bilinnsamling/
 backend/data/csv/
-backend/data/dom10/
+backend/data/dom10/data/
+backend/data/dom10/metadata/
+backend/data/dom10/landsdekkende/
+backend/data/merged_raster_romsdalen_10.tif
 backend/data/DOM10_UTM33_20250117/
 backend/veglenkerEV136.json
