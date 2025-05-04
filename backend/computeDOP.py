@@ -129,6 +129,7 @@ def best_2(satellites, observer):
 
 # Main function to compute DOP at a specific point in time and location
 def find_dop_on_point(dem_data, src, gnss_mapping, gnss, time, point, elevation_angle, step):
+
     # Convert observation point to EN-coordinates and find height from DEM
     observation_point_latlng = point['geometry']['coordinates']
     observation_point_EN = transformerToEN.transform(observation_point_latlng[0], observation_point_latlng[1])  

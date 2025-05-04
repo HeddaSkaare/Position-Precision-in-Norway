@@ -150,6 +150,7 @@ def dopValues():
                 #PDOP_list.append(dop_point[0][1])
 
                 yield f"{int((step / total_steps) * 100)}\n\n"
+            src.close()
 
         # Når prosessen er ferdig
         yield f"{json.dumps(dop_list)}\n\n"

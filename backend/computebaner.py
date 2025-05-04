@@ -177,17 +177,19 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
     given_date = datetime.strptime(t, "%Y-%m-%dT%H:%M:%S.%f")
     daynumber = getDayNumber(given_date)
     gnss_mapping = get_gnss(daynumber,given_date.year )
-    
+    elevationCutoffs = []
+    final_list = []
+    final_listdf = []
+    observation_cartesian = []
     with rasterio.open("data/merged_raster.tif") as src:
         dem_data = src.read(1)  
 
         observer_height = dem_data[src.index(observation_EN[0], observation_EN[1])]
-        print(f'observer: {observation_lngLat}, {observer_height}')
+        #print(f'observer: {observation_lngLat}, {observer_height}')
         observation_cartesian = Cartesian(observation_lngLat[1]* np.pi/180, observation_lngLat[0]* np.pi/180, observer_height)
         observation_end = [observation_EN[0], observation_EN[1], observer_height]
 
-        final_list = []
-        final_listdf = []
+
         print('finds visual satellites')
         calculations = int(epoch)* int((60/frequency))
         for i in range(0, calculations):
@@ -207,10 +209,11 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
             final_list.append([df.to_dict() for df in LGDF_df])
             final_listdf.append(LGDF_df)
        
-        elevationCutoffs = []
+        
         for i in range(0,360,1):
             top = check_satellite_sight_2(observation_end,dem_data,src, 5000, elevation_mask, i)
             elevationCutoffs.append(top)
+        src.close()
 
     
     return final_list, final_listdf,elevationCutoffs,observation_cartesian
