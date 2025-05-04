@@ -134,13 +134,14 @@ def dopValues():
 
 
     time = datetime.fromisoformat(time_str)
-    dop_list = []
+    
     #PDOP_list = []
     daynumber = getDayNumber(time)
     gnss_mapping = get_gnss(daynumber, time.year)
     total_steps = len(points) + 1
 
     def generate():
+        dop_list = []
         with rasterio.open("data/merged_raster.tif") as src:
             dem_data = src.read(1)
 
@@ -150,7 +151,7 @@ def dopValues():
                 #PDOP_list.append(dop_point[0][1])
 
                 yield f"{int((step / total_steps) * 100)}\n\n"
-            src.close()
+    
 
         # Når prosessen er ferdig
         yield f"{json.dumps(dop_list)}\n\n"
