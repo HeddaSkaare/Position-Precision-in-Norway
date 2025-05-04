@@ -1,5 +1,7 @@
 import { atom } from 'jotai'
 
+export const API_URL = "https://position-precision-in-norway-production.up.railway.app";
+
 export const updateDataState = atom(false)
 
 export const timeState = atom(new Date())

@@ -8,7 +8,7 @@ import customMarkerIcon from '../assets/pngwing.png';
 import A from '../assets/A.png';
 import B from '../assets/B.png';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import {startPointState, endPointState, distanceState, roadState,pointsState, vegReferanseState, geoJsonDataState} from '../states/states';
+import {startPointState, endPointState, distanceState, roadState,pointsState, vegReferanseState, geoJsonDataState,API_URL} from '../states/states';
 import '../css/map.css';
 import proj4 from 'proj4';
 
@@ -115,7 +115,7 @@ const NavMap = () => {
     console.log("startPoint", startPoint);
     console.log("endPoint", endPoint);
   
-    fetch('https://position-precision-in-norway.onrender.com/road', {
+    fetch(`${API_URL}/road`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

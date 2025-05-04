@@ -13,7 +13,7 @@ import { Line } from 'react-chartjs-2';
 import '../css/DOPplot.css';
 import { useAtom, useAtomValue } from 'jotai';
 import { useState, useEffect } from 'react';
-import { gnssState, elevationState, timeState, epochState, pointsState, updateDOPState } from '../states/states';
+import { gnssState, elevationState, timeState, epochState, pointsState, updateDOPState,API_URL } from '../states/states';
 // Register the necessary components for line charts
 ChartJS.register(
   CategoryScale,
@@ -59,7 +59,7 @@ export const DOPLineChart = () => {
           points: points       // Send directly as an array
       };
   
-      fetch('https://position-precision-in-norway.onrender.com/dopvalues', {
+      fetch(`${API_URL}/dopvalues`, {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'

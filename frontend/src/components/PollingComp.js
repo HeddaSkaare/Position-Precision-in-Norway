@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../states/states'; // Adjust the import path as necessary
 
 const PollingComponent = () => {
   const [data, setData] = useState(null);
@@ -8,7 +9,7 @@ const PollingComponent = () => {
 
   // Function to check if data is ready
   const pollData = () => {
-    axios.get('https://position-precision-in-norway.onrender.com/satellites')
+    axios.get(`${API_URL}/satellites`)
       .then(response => {
         if (response.data && response.data.data) {
           setData(response.data.data);  

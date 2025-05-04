@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAtom, useAtomValue } from 'jotai'
-import {elevationState, updateDataState,timeState, gnssState, epochState, pointsState, startPointState, chosenPointState,epochFrequencyState} from '../states/states';
+import {elevationState, updateDataState,timeState, gnssState, epochState, pointsState, API_URL, chosenPointState,epochFrequencyState} from '../states/states';
 import { SatelliteMap } from './SkyPlot';
 import '../css/visualization.css';
 import { BarChartGraph } from './BoxPlot';
@@ -97,7 +97,7 @@ const Visualization = () => {
       const filteredGNSS = Object.keys(gnssNames).filter((key) => gnssNames[key]);
       const searchPoint = points[cosenPoint].geometry.coordinates;
 
-      fetch('https://position-precision-in-norway.onrender.com/satellites', {
+      fetch(`${API_URL}/satellites`, {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
