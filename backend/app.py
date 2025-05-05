@@ -7,7 +7,7 @@ from flask_cors import CORS
 from datetime import datetime
 from romsdalenRoad import calculate_travel_time, get_road_api
 import rasterio
-
+import psutil, os
 
 distance = None
 points = None
@@ -139,10 +139,15 @@ def dopValues():
     daynumber = getDayNumber(time)
     gnss_mapping = get_gnss(daynumber, time.year)
     total_steps = len(points) + 1
+    
 
+    # kjør kode
+    
     def generate():
+        CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+        raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
         dop_list = []
-        with rasterio.open("data/merged_raster.tif") as src:
+        with rasterio.open(raster_path) as src:
             dem_data = src.read(1)
 
             for step, point in enumerate(points, start=1):
@@ -152,7 +157,7 @@ def dopValues():
 
                 yield f"{int((step / total_steps) * 100)}\n\n"
     
-
+          
         # Når prosessen er ferdig
         yield f"{json.dumps(dop_list)}\n\n"
 

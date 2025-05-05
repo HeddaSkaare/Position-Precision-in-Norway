@@ -4,6 +4,7 @@ from pyproj import Transformer
 from computebaner import Cartesian, get_gnss, getDayNumber, runData_check_sight, satellites_at_point_2
 from common_variables import phi,lam,c
 import rasterio
+import psutil, os
 # Set up coordinate transformers between UTM and WGS84
 transformer = Transformer.from_crs("EPSG:25833", "EPSG:4326", always_xy=True)
 transformerToEN = Transformer.from_crs("EPSG:4326","EPSG:25833", always_xy=True)
@@ -77,6 +78,8 @@ def best(satellites, recieverPos0):
         else:
             final_DOP_values.append([0, 0, 0, 0, 0])
     print('final_DOP_values skyplot:', final_DOP_values[0])
+    process = psutil.Process(os.getpid())
+    print(f"Memory usageafter dop calc: {process.memory_info().rss / 1024 ** 2:.2f} MB")
     return final_DOP_values
 
 # DOP computation using XYZ-only satellite format
@@ -149,7 +152,13 @@ def find_dop_on_point(dem_data, src, gnss_mapping, gnss, time, point, elevation_
     # Compute DOP
     dopvalues = best_2(satellites, obs_cartesian)
     if step == 1:
+
+        process = psutil.Process(os.getpid())
+        print("RAM før:", process.memory_info().rss / (1024 * 1024), "MB")
         print('dop for road:',dopvalues)
+    if step==11:
+        process = psutil.Process(os.getpid())
+        print("RAM etter:", process.memory_info().rss / (1024 * 1024), "MB")  
     
     return dopvalues
 

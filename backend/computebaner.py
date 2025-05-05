@@ -7,6 +7,7 @@ from satellitePositions import get_satellite_positions
 from generateElevationMask import check_satellite_sight, check_satellite_sight_2
 from common_variables import wgs
 import rasterio
+import psutil, os
 
 # Set up coordinate transformers
 transformer = Transformer.from_crs("EPSG:25833", "EPSG:4326", always_xy=True)
@@ -168,7 +169,8 @@ def visualCheck_3(satellites, observer_cartesian, observer, observation_lngLat, 
 def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observation_lngLat):
 
     print('in runData_check_sight')
-
+    process = psutil.Process(os.getpid())
+    print(f"Memory usage: {process.memory_info().rss / 1024 ** 2:.2f} MB")
 
     elevation_mask = float(elevationstring)
 
@@ -213,7 +215,7 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
         for i in range(0,360,1):
             top = check_satellite_sight_2(observation_end,dem_data,src, 5000, elevation_mask, i)
             elevationCutoffs.append(top)
-        
+    print(f"Memory usage after run data: {process.memory_info().rss / 1024 ** 2:.2f} MB") 
     return final_list, final_listdf,elevationCutoffs,observation_cartesian
 
 

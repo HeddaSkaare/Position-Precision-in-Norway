@@ -1,6 +1,7 @@
 import { atom } from 'jotai'
 
-export const API_URL = "https://position-precision-in-norway-production.up.railway.app";
+//export const API_URL = "https://position-precision-in-norway-production.up.railway.app";
+export const API_URL = "http://127.0.0.1:5000";
 
 export const updateDataState = atom(false)
 
