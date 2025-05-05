@@ -179,9 +179,10 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
     given_date = datetime.strptime(t, "%Y-%m-%dT%H:%M:%S.%f")
     daynumber = getDayNumber(given_date)
     gnss_mapping = get_gnss(daynumber,given_date.year )
-
+    CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+    raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
     #observation_cartesian = []
-    with rasterio.open("data/merged_raster.tif") as src:
+    with rasterio.open(raster_path) as src:
         dem_data = src.read(1)  
 
         observer_height = dem_data[src.index(observation_EN[0], observation_EN[1])]
