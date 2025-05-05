@@ -29,6 +29,7 @@ nvdbapi-v3==1.0.0
 packaging==24.2
 pandas==2.2.3
 pillow==11.1.0
+psutil==7.0.0
 pynmeagps==1.0.48
 pyogrio==0.10.0
 pyparsing==3.2.1
