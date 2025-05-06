@@ -134,7 +134,7 @@ const Visualization = () => {
       
 
 
-    }, [updateData, time, elevationAngle, epoch, gnssNames, setUpdateData]);
+    }, [updateData, time, elevationAngle, epoch, gnssNames, setUpdateData, points, epochFrequency, cosenPoint]);
     
   if (updateData) {
     return <div className="loading_tekst"><p>Loading data...</p></div>;
