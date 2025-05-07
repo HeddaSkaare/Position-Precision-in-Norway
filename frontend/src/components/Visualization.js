@@ -85,7 +85,7 @@ const Visualization = () => {
     const points = useAtomValue(pointsState);
     const cosenPoint = useAtomValue(chosenPointState);
 
-    const labels = Array.from({ length: 2 * epoch +1}, (_, i) => 
+    const labels = Array.from({ length: (60/epochFrequency) * epoch +1}, (_, i) => 
       new Date(time.getTime() + i * epochFrequency * 60 * 1000).toISOString().slice(11, 16)
     );
     const [DOP, setDOP] = useState([[0,0,0]]);
@@ -95,8 +95,8 @@ const Visualization = () => {
       if (!updateData) return; 
     
       const filteredGNSS = Object.keys(gnssNames).filter((key) => gnssNames[key]);
-      const searchPoint = points[cosenPoint].geometry.coordinates;
-
+      //const searchPoint = points[cosenPoint].geometry.coordinates;
+      const searchPoint = [8.511978754550908, 62.197726159806415];
       fetch('http://127.0.0.1:5000/satellites', {
         headers: {
           'Accept': 'application/json',
