@@ -11,9 +11,13 @@ def lastned(day, year):
     # ✅ Sørg for at mappen finnes:
     os.makedirs(folder, exist_ok=True)
     url = f'https://cddis.nasa.gov/archive/gnss/data/daily/{year}/brdc/{filename}'
-
+    user = os.getenv('EARTHDATA_USER')
+    pw = os.getenv('EARTHDATA_PASS')
     if not os.path.isfile(folder+filename[:-3]):
-        r = requests.get(url)
+        r = requests.get(url, auth=(user, pw))
+        if r.status_code != 200:
+            raise Exception(f"Feil ved nedlasting: {r.status_code} - {r.text}")
+
         c = r.content
       
         with open(filename, 'wb') as fd:
