@@ -540,115 +540,105 @@ def update_navigation_message_type(df):
 
 def sortData(daynumber, date):
 
-    if os.path.exists(f"DataFrames/{date.year}/{daynumber}/structured_dataG.csv"):
+    CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    output_folder = os.path.join(CURRENT_DIR, "DataFrames", str(date.year), str(daynumber))
+    file_pathG = os.path.join(output_folder, "structured_dataG.csv")
+
+    if os.path.exists(file_pathG):
         print(f"Data on day {daynumber} already sorted")
         return
     else:
-        filename = f'unzipped/BRD400DLR_S_{date.year}{daynumber}0000_01D_MN.rnx'
-        lastned(daynumber,date.year )
-        #current date
+        # ---- Last ned og pakk ut ----
+        filename = f'BRD400DLR_S_{date.year}{daynumber}0000_01D_MN.rnx'
+        # Bruk full sti til fila som skal leses
+        filepath = os.path.join(CURRENT_DIR, "unzipped", filename)
+
+        lastned(daynumber, date.year)
+
         current_date = date.date()
-        #creates new dataFrames, based on the columns from Dataframes
-        structured_dataG = pd.DataFrame(columns = columnsG)
-        structured_dataR = pd.DataFrame(columns = columnsR) 
-        structured_dataE = pd.DataFrame(columns = columnsE) 
-        structured_dataJ = pd.DataFrame(columns = columnsJ) 
-        structured_dataC = pd.DataFrame(columns = columnsC) 
-        structured_dataI = pd.DataFrame(columns = columnsI) 
-        structured_dataS = pd.DataFrame(columns = columnsS)
-        content = []
-        with open(filename, "r") as file:
-            print(f"Reading file {filename}")
+
+        structured_dataG = pd.DataFrame(columns=columnsG)
+        structured_dataR = pd.DataFrame(columns=columnsR)
+        structured_dataE = pd.DataFrame(columns=columnsE)
+        structured_dataJ = pd.DataFrame(columns=columnsJ)
+        structured_dataC = pd.DataFrame(columns=columnsC)
+        structured_dataI = pd.DataFrame(columns=columnsI)
+        structured_dataS = pd.DataFrame(columns=columnsS)
+
+        with open(filepath, "r") as file:
+            print(f"Reading file {filepath}")
             content = file.read()
 
         split_index = content.index("END OF HEADER")
-        header_part = content[:split_index] # baneinformasjon
-        data_part = content[split_index+13:] #satelitt informasjon
+        header_part = content[:split_index]
+        data_part = content[split_index+13:]
 
         satellitt_data = re.split(r'\s*> EPH\s*', data_part)
         print(len(satellitt_data))
-        for i in range(1,len(satellitt_data)-1):
+
+        for i in range(1, len(satellitt_data)-1):
             lines = satellitt_data[i].strip().splitlines()
-            satellitt_id = lines[0].split(' ')[0] 
+            satellitt_id = lines[0].split(' ')[0]
             type = lines[0].split()[1]
-        
+
             flattened_forstelinje = flatten(list(map(split_on_second_sign, lines[1].split()[1:])))
             cleaned_forstelinje = [item for item in flattened_forstelinje if item != '']
-            
+
             values_lines = lines[2:]
             values_list = []
             for line in values_lines:
                 flattenedLine = flatten(list(map(split_on_second_sign, line.split())))
                 cleanedLine = [item for item in flattenedLine if item != '']
-                while len(cleanedLine)<4:
+                while len(cleanedLine) < 4:
                     cleanedLine.append(np.nan)
                 values_list += cleanedLine
 
-            time = datetime(int(cleaned_forstelinje[0]),int(cleaned_forstelinje[1]), int(cleaned_forstelinje[2]), int(cleaned_forstelinje[3]), int(cleaned_forstelinje[4]), int(cleaned_forstelinje[5]))
-            
+            time = datetime(int(cleaned_forstelinje[0]), int(cleaned_forstelinje[1]),
+                            int(cleaned_forstelinje[2]), int(cleaned_forstelinje[3]),
+                            int(cleaned_forstelinje[4]), int(cleaned_forstelinje[5]))
+
             SV = cleaned_forstelinje[6:]
 
             for i in range(len(SV)):
-                value = SV[i]
-                floatNumber = strToFloat(value)
-                SV[i] = floatNumber
+                SV[i] = strToFloat(SV[i])
             for j in range(len(values_list)):
-                value = values_list[j]
-                if isinstance(value, str):
-                    floatNumber = strToFloat(value)
-                    values_list[j] = floatNumber
-            
+                if isinstance(values_list[j], str):
+                    values_list[j] = strToFloat(values_list[j])
+
             if time.date() == current_date:
                 if "G" in satellitt_id:
-                    GPSdata(structured_dataG,satellitt_id,time,values_list, SV, type)
+                    GPSdata(structured_dataG, satellitt_id, time, values_list, SV, type)
                 elif "R" in satellitt_id:
-                    GLONASSdata(structured_dataR ,satellitt_id,time,values_list, SV, type)
+                    GLONASSdata(structured_dataR, satellitt_id, time, values_list, SV, type)
                 elif "J" in satellitt_id:
-                    QZSSdata(structured_dataJ,satellitt_id,time,values_list, SV, type)
+                    QZSSdata(structured_dataJ, satellitt_id, time, values_list, SV, type)
                 elif "C" in satellitt_id:
-                    BeiDoudata(structured_dataC,satellitt_id,time,values_list, SV, type)
+                    BeiDoudata(structured_dataC, satellitt_id, time, values_list, SV, type)
                 elif "I" in satellitt_id:
-                    NavICdata(structured_dataI,satellitt_id,time,values_list, SV, type)
+                    NavICdata(structured_dataI, satellitt_id, time, values_list, SV, type)
                 elif "S" in satellitt_id:
-                    SBASdata(structured_dataS,satellitt_id,time,values_list, SV, type)
+                    SBASdata(structured_dataS, satellitt_id, time, values_list, SV, type)
                 elif "E" in satellitt_id:
-                    Galileiodata(structured_dataE,satellitt_id,time,values_list, SV, type)
+                    Galileiodata(structured_dataE, satellitt_id, time, values_list, SV, type)
 
-        #må filtrere for beidou, qzss og gps
-        #på beidou
-        
         print(f"Processing at {time}")
 
-        # After processing and before saving, update the navigation message type
-        #structured_dataG = update_navigation_message_type(structured_dataG)
+        # Oppdater navigation type for noen systemer
         structured_dataJ = update_navigation_message_type(structured_dataJ)
         structured_dataC = update_navigation_message_type(structured_dataC)
- 
 
-        output_folder = f"DataFrames/{date.year}/" + str(daynumber)
+        # ✅ Lag mappe hvis den ikke finnes
         os.makedirs(output_folder, exist_ok=True)
-        file_pathG = os.path.join(output_folder, "structured_dataG.csv")
-        structured_dataG = structured_dataG.sort_values(by=['satelite_id', 'Datetime'])
-        structured_dataG.to_csv(file_pathG, index=False)
-        file_pathR = os.path.join(output_folder, "structured_dataR.csv")
-        structured_dataR = structured_dataR.sort_values(by=['satelite_id', 'Datetime'])
-        structured_dataR.to_csv(file_pathR, index=False)
-        file_pathE = os.path.join(output_folder, "structured_dataE.csv")
-        structured_dataE = structured_dataE.sort_values(by=['satelite_id', 'Datetime'])
-        structured_dataE.to_csv(file_pathE, index=False)
-        file_pathJ = os.path.join(output_folder, "structured_dataJ.csv")
-        structured_dataJ = structured_dataJ.sort_values(by=['satelite_id', 'Datetime'])
-        structured_dataJ.to_csv(file_pathJ, index=False)
-        file_pathC = os.path.join(output_folder, "structured_dataC.csv")
-        structured_dataC = structured_dataC.sort_values(by=['satelite_id', 'Datetime'])
-        structured_dataC.to_csv(file_pathC, index=False)
-        file_pathI = os.path.join(output_folder, "structured_dataI.csv")
-        structured_dataI = structured_dataI.sort_values(by=['satelite_id', 'Datetime'])
-        structured_dataI.to_csv(file_pathI, index=False)
-        file_pathS = os.path.join(output_folder, "structured_dataS.csv")
-        structured_dataS = structured_dataS.sort_values(by=['satelite_id', 'Datetime'])
-        structured_dataS.to_csv(file_pathS, index=False)
 
+        # ✅ Lagre CSV-er med full sti
+        structured_dataG.sort_values(by=['satelite_id', 'Datetime']).to_csv(os.path.join(output_folder, "structured_dataG.csv"), index=False)
+        structured_dataR.sort_values(by=['satelite_id', 'Datetime']).to_csv(os.path.join(output_folder, "structured_dataR.csv"), index=False)
+        structured_dataE.sort_values(by=['satelite_id', 'Datetime']).to_csv(os.path.join(output_folder, "structured_dataE.csv"), index=False)
+        structured_dataJ.sort_values(by=['satelite_id', 'Datetime']).to_csv(os.path.join(output_folder, "structured_dataJ.csv"), index=False)
+        structured_dataC.sort_values(by=['satelite_id', 'Datetime']).to_csv(os.path.join(output_folder, "structured_dataC.csv"), index=False)
+        structured_dataI.sort_values(by=['satelite_id', 'Datetime']).to_csv(os.path.join(output_folder, "structured_dataI.csv"), index=False)
+        structured_dataS.sort_values(by=['satelite_id', 'Datetime']).to_csv(os.path.join(output_folder, "structured_dataS.csv"), index=False)
 
     
 #sortData('099', datetime(2025, 4, 9, 0, 0))

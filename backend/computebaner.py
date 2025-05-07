@@ -12,6 +12,7 @@ import psutil, os
 # Set up coordinate transformers
 transformer = Transformer.from_crs("EPSG:25833", "EPSG:4326", always_xy=True)
 transformerToEN = Transformer.from_crs("EPSG:4326","EPSG:25833", always_xy=True)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Convert geodetic coordinates to ECEF (Earth-Centered, Earth-Fixed)
 def Cartesian(phi,lam, h):
     N = (wgs.a**2)/np.sqrt(wgs.a**2*(np.cos(phi))**2 + wgs.b**2*(np.sin(phi))**2)
@@ -56,16 +57,16 @@ def getDayNumber(date):
     return daynumber
 
 # Load structured GNSS data for a specific day/year
-def get_gnss(daynumber,year):
+def get_gnss(daynumber, year):
     print('in gnss_mapping')
     gnss_mapping = {
-        'GPS': pd.read_csv(f"DataFrames/{year}/{daynumber}/structured_dataG.csv"),
-        'GLONASS': pd.read_csv(f"DataFrames/{year}/{daynumber}/structured_dataR.csv"),
-        'Galileo': pd.read_csv(f"DataFrames/{year}/{daynumber}/structured_dataE.csv"),
-        'QZSS': pd.read_csv(f"DataFrames/{year}/{daynumber}/structured_dataJ.csv"),
-        'BeiDou': pd.read_csv(f"DataFrames/{year}/{daynumber}/structured_dataC.csv"),
-        'NavIC': pd.read_csv(f"DataFrames/{year}/{daynumber}/structured_dataI.csv"),
-        'SBAS': pd.read_csv(f"DataFrames/{year}/{daynumber}/structured_dataS.csv")
+        'GPS': pd.read_csv(os.path.join(CURRENT_DIR, "DataFrames", str(year), str(daynumber), "structured_dataG.csv")),
+        'GLONASS': pd.read_csv(os.path.join(CURRENT_DIR, "DataFrames", str(year), str(daynumber), "structured_dataR.csv")),
+        'Galileo': pd.read_csv(os.path.join(CURRENT_DIR, "DataFrames", str(year), str(daynumber), "structured_dataE.csv")),
+        'QZSS': pd.read_csv(os.path.join(CURRENT_DIR, "DataFrames", str(year), str(daynumber), "structured_dataJ.csv")),
+        'BeiDou': pd.read_csv(os.path.join(CURRENT_DIR, "DataFrames", str(year), str(daynumber), "structured_dataC.csv")),
+        'NavIC': pd.read_csv(os.path.join(CURRENT_DIR, "DataFrames", str(year), str(daynumber), "structured_dataI.csv")),
+        'SBAS': pd.read_csv(os.path.join(CURRENT_DIR, "DataFrames", str(year), str(daynumber), "structured_dataS.csv"))
     }
     return gnss_mapping
 
@@ -167,7 +168,7 @@ def visualCheck_3(satellites, observer_cartesian, observer, observation_lngLat, 
 # Returnerer både DataFrame og dictionary-format
 
 def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observation_lngLat):
-
+    
     print('in runData_check_sight')
     process = psutil.Process(os.getpid())
     print(f"Memory usage: {process.memory_info().rss / 1024 ** 2:.2f} MB")
@@ -179,7 +180,7 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
     given_date = datetime.strptime(t, "%Y-%m-%dT%H:%M:%S.%f")
     daynumber = getDayNumber(given_date)
     gnss_mapping = get_gnss(daynumber,given_date.year )
-    CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
     raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
     #observation_cartesian = []
     with rasterio.open(raster_path) as src:
