@@ -20,7 +20,8 @@ def lastned(day, year):
 
     user = os.getenv('EARTHDATA_USER')
     pw = os.getenv('EARTHDATA_PASS')
-
+    print("Brukernavn:", user)
+    print("Passord satt:", pw is not None)
     if not os.path.isfile(unzipped_path):
         r = requests.get(url, auth=(user, pw))
         if r.status_code != 200:
