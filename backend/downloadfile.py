@@ -1,4 +1,5 @@
 import requests
+from requests.auth import HTTPBasicAuth
 import gzip
 import os
 
@@ -18,12 +19,12 @@ def lastned(day, year):
 
     url = f'https://cddis.nasa.gov/archive/gnss/data/daily/{year}/brdc/{filename_gz}'
 
-    user = os.getenv('EARTHDATA_USER')
-    pw = os.getenv('EARTHDATA_PASS')
-    print("Brukernavn:", user)
-    print("Passord satt:", pw is not None)
+    user = os.environ.get('EARTHDATA_USER')
+    pw = os.environ.get('EARTHDATA_PASS')
+    
     if not os.path.isfile(unzipped_path):
-        r = requests.get(url, auth=(user, pw))
+        auth = HTTPBasicAuth(user, pw)
+        r = requests.get(url, auth=auth)
         if r.status_code != 200:
             print("Feil ved nedlasting:", r.status_code)
             print("Svar fra serveren:", r.text[:500])  # Vis litt av HTML-feilen hvis den finnes

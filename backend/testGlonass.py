@@ -192,17 +192,17 @@ import pandas as pd
 # plt.tight_layout()
 # plt.show()
 
-import rasterio
+# import rasterio
 
-with rasterio.open("data/dom10/landsdekkende/64m1_1_10m_z33.tif") as src:
-    bounds = src.bounds
-    print("Venstre:", bounds.left)
-    print("Høyre:", bounds.right)
-    print("Nedre:", bounds.bottom)
-    print("Øvre:", bounds.top)
+# with rasterio.open("data/dom10/landsdekkende/64m1_1_10m_z33.tif") as src:
+#     bounds = src.bounds
+#     print("Venstre:", bounds.left)
+#     print("Høyre:", bounds.right)
+#     print("Nedre:", bounds.bottom)
+#     print("Øvre:", bounds.top)
 
-    width = bounds.right - bounds.left
-    height = bounds.top - bounds.bottom
-    print("Bredde (m):", width)
-    print("Høyde (m):", height)
-    print("Areal (km²):", (width * height) / 1e6)
+#     width = bounds.right - bounds.left
+#     height = bounds.top - bounds.bottom
+#     print("Bredde (m):", width)
+#     print("Høyde (m):", height)
+#     print("Areal (km²):", (width * height) / 1e6)
