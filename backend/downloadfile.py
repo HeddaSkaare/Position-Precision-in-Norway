@@ -20,12 +20,13 @@ def lastned(day, year):
 
     url = f'https://cddis.nasa.gov/archive/gnss/data/daily/{year}/brdc/{filename_gz}'
 
-    user = os.environ.get('EARTHDATA_USER')
-    pw = os.environ.get('EARTHDATA_PASS')
-    
+    user = os.getenv('EARTHDATA_USER')
+    pw = os.getenv('EARTHDATA_PASS')
+    if not user or not pw:
+        raise EnvironmentError("DATA_USERNAME eller DATA_PASSWORD er ikke satt")
     if not os.path.isfile(unzipped_path):
-        auth = HTTPBasicAuth(user, pw)
-        r = requests.get(url, auth=auth)
+        authorization = HTTPBasicAuth(user, pw)
+        r = requests.get(url, auth=authorization)
         if r.status_code != 200:
             print("Feil ved nedlasting:", r.status_code)
             print("Svar fra serveren:", r.text[:500])  # Vis litt av HTML-feilen hvis den finnes
