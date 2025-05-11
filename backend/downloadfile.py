@@ -1,6 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import gzip
+import logging
 import os
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,9 +31,11 @@ def lastned(day, year):
             print("Svar fra serveren:", r.text[:500])  # Vis litt av HTML-feilen hvis den finnes
             raise Exception(f"Kunne ikke laste ned fila {filename_gz}. Status: {r.status_code}")
 
-        print(f"[DEBUG] Status code: {r.status_code}")
-        print(f"[DEBUG] Response headers: {r.headers}")
-        print(f"[DEBUG] Response snippet: {r.text[:200]}")
+        print(f"[DEBUG] Status code: {r.status_code}",flush=True)
+        print(f"[DEBUG] Response headers: {r.headers}",flush=True)
+        print(f"[DEBUG] Response snippet: {r.text[:200]}",flush=True)
+        logging.basicConfig(level=logging.DEBUG)
+        logging.debug("Dette er en debug-logg")
         # ✅ Lagre den nedlastede gzip-fila midlertidig
         with open(gz_path, 'wb') as fd:
             fd.write(r.content)
