@@ -31,11 +31,9 @@ def lastned(day, year):
             print("Svar fra serveren:", r.text[:500])  # Vis litt av HTML-feilen hvis den finnes
             raise Exception(f"Kunne ikke laste ned fila {filename_gz}. Status: {r.status_code}")
 
-        print(f"[DEBUG] Status code: {r.status_code}",flush=True)
-        print(f"[DEBUG] Response headers: {r.headers}",flush=True)
-        print(f"[DEBUG] Response snippet: {r.text[:200]}",flush=True)
-        logging.basicConfig(level=logging.DEBUG)
-        logging.debug("Dette er en debug-logg")
+        print("[DEBUG] Response snippet:", r.text[:500], flush=True)
+        print("[DEBUG] usr og pw:", user,pw, flush=True)
+
         # ✅ Lagre den nedlastede gzip-fila midlertidig
         with open(gz_path, 'wb') as fd:
             fd.write(r.content)
