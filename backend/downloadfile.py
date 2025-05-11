@@ -30,6 +30,9 @@ def lastned(day, year):
             print("Svar fra serveren:", r.text[:500])  # Vis litt av HTML-feilen hvis den finnes
             raise Exception(f"Kunne ikke laste ned fila {filename_gz}. Status: {r.status_code}")
 
+        print(f"[DEBUG] Status code: {r.status_code}")
+        print(f"[DEBUG] Response headers: {r.headers}")
+        print(f"[DEBUG] Response snippet: {r.text[:200]}")
         # ✅ Lagre den nedlastede gzip-fila midlertidig
         with open(gz_path, 'wb') as fd:
             fd.write(r.content)
@@ -37,6 +40,7 @@ def lastned(day, year):
         # ✅ Pakk ut fila
         with open(gz_path, 'rb') as fd:
             try:
+                
                 gzip_fd = gzip.GzipFile(fileobj=fd)
                 data = gzip_fd.read()
             except gzip.BadGzipFile as e:
