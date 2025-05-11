@@ -81,9 +81,9 @@ import pandas as pd
 # plt.gca().set_facecolor('#faf9f6')   # Bakgrunn inni selve plot-området
 # plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
 # plt.xticks(rotation=45)
-# plt.title('PDOP values along the road segment when using constellations')
-# plt.xlabel('Distance along the road (m)')
-# plt.ylabel('PDOP value')
+# plt.title('PDOP values along the road segment when using constellations', fontsize = 20)
+# plt.xlabel('Distance along the road (m)', fontsize = 18)
+# plt.ylabel('PDOP value', fontsize = 18)
 # plt.ylim(0, 40)
 # plt.legend()
 # plt.grid(True)
@@ -96,21 +96,21 @@ import pandas as pd
 
 # # --- 2. LAG STOLPEDIAAGRAM ---
 # plt.figure(figsize=(10, 6))
-# bars = plt.bar(konfigurasjoner, pdop_127, color='skyblue', edgecolor='black')
+# bars = plt.bar(konfigurasjoner, pdop_216, color='#66bb6a', edgecolor='black')
 
 # # --- 3. LEGG TIL VERDIMERKING PÅ TOPPEN ---
-# for bar, val in zip(bars, pdop_127):
+# for bar, val in zip(bars, pdop_216):
 #     if val == 0:
 #         # Legg til verdien på toppen av stolpen
-#         plt.text(bar.get_x() + bar.get_width()/2, val + 0.05, f'None', ha='center', va='bottom')
+#         plt.text(bar.get_x() + bar.get_width()/2, val + 0.05, f'None', ha='center', va='bottom', fontsize=16)
 #     else:
-#         plt.text(bar.get_x() + bar.get_width()/2, val + 0.05, f'{val:.3f}', ha='center', va='bottom')
+#         plt.text(bar.get_x() + bar.get_width()/2, val + 0.05, f'{val:.3f}', ha='center', va='bottom',fontsize=16)
 
 # # --- 4. FORMATERING ---
-# plt.title("PDOP for Point 127 with Different GNSS Configurations")
-# plt.ylabel("PDOP Value")
-# plt.xticks(rotation=30, ha='right')
-# plt.ylim(0, max(pdop_127) + 10)
+# plt.title("PDOP for Point 216 with Different GNSS Configurations", fontsize=18)
+# plt.ylabel("PDOP Value", fontsize=18)
+# plt.xticks(rotation=30, ha='right', fontsize=16)
+# plt.ylim(0, max(pdop_216) + 1)
 # plt.grid(axis='y', linestyle='--', alpha=0.7)
 # plt.tight_layout()
 
@@ -187,93 +187,93 @@ import pandas as pd
 # plt.show()
 
 #sammenligne  sør og nord
-# PDOP_sør = []
-# PDOP_nord = []
+PDOP_sør = []
+PDOP_nord = []
 
-# with open('PDOP_nord.json', 'r') as f:
-#     data = json.load(f)
-#     PDOP_sør = data
-#     f.close()
-# with open('PDOP_sør.json', 'r') as f:
-#     data = json.load(f)
-#     PDOP_nord = data
-#     f.close()
-
-
-# x_labels = np.linspace(0, 7100, 72)
-
-# plt.plot(x_labels, PDOP_nord, label='Northern Norway', color='#d62728')        # Soft blå
-# plt.plot(x_labels, PDOP_sør[:72], label='Southern Norway ', color='#9467bd')             # Oransje
-
-# plt.gca().set_facecolor('#faf9f6')   # Bakgrunn inni selve plot-området
-# plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
-# plt.xticks(rotation=45)
-# plt.title('PDOP Values in South vs North Norway')
-# plt.xlabel('Points along the road (m)')
-# plt.ylabel('PDOP value')
-# plt.legend()
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
-
-#sammenligne iløpet av døgnet
-p1 = []
-p2 = []
-p3 = []
-w1 = []
-w2= []
-w3= []
-w4= []
-
-# # with open('pdop33.json', 'r') as f:
-# #     data = json.load(f)
-# #     p1 = data[0]
-# #     p2 = data[1]
-# #     p3 = data[2]
-# #     f.close()
-with open('pdopVaries.json', 'r') as f:
+with open('PDOP_nord.json', 'r') as f:
     data = json.load(f)
-  
-    w4 = np.mean(data[2], axis=0)
-    # # p1 = np.mean(data[0], axis=0)
-    # # # p2 = data[1]
-    # # p3 = np.median(data[1], axis=0)
+    PDOP_sør = data
     f.close()
-with open('pdopweaks.json', 'r') as f:
-    data2 = json.load(f)
-    
-    w1 = np.mean(data2[0], axis=0)
-    w2 = np.mean(data2[1], axis=0)
-    w3 = np.mean(data2[2], axis=0)
+with open('PDOP_sør.json', 'r') as f:
+    data = json.load(f)
+    PDOP_nord = data
     f.close()
 
 
-x_labels = np.linspace(0, 23, 24)
-print(len(w1))
-print(len(w2))
-print(len(w3))
-print(len(w4))
+x_labels = np.linspace(0, 7100, 72)
 
-# # plt.plot(x_labels, p1, label='Point 1', color='#1f77b4')   # Blå (moderne)
-# # #plt.plot(x_labels, p2, label='Point 2', color='#ff7f0e')   # Oransje (myk)
-# # plt.plot(x_labels, p3, label='Point 3', color='#2ca02c')   # Grønn
-
-plt.plot(x_labels, w1, label='GPS Week 2360', color='#1f77b4')   # Blå
-plt.plot(x_labels, w2, label='GPS Week 2361', color='#ff7f0e')   # Oransje
-plt.plot(x_labels, w3, label='GPS Week 2362', color='#2ca02c')   # Grønn
-plt.plot(x_labels, w4, label='GPS Week 2363', color='#d62728')   # Rød
+plt.plot(x_labels, PDOP_nord, label='Northern Norway', color='#d62728')        # Soft blå
+plt.plot(x_labels, PDOP_sør[:72], label='Southern Norway ', color='#9467bd')             # Oransje
 
 plt.gca().set_facecolor('#faf9f6')   # Bakgrunn inni selve plot-området
 plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
-plt.xticks(x_labels)  # 👈 VIKTIG: vis ALLE x-ticks!
 plt.xticks(rotation=45)
-plt.title('Mean PDOP Values Throughout the Day Over Different Weeks', fontsize = 20)
-plt.xlabel('Time of Day (hours)',fontsize=18)
-plt.ylabel('PDOP value', fontsize=18)
+plt.title('PDOP Values in South vs North Norway', fontsize = 20)
+plt.xlabel('Points along the road (m)', fontsize = 18)
+plt.ylabel('PDOP value', fontsize = 18)
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+
+#sammenligne iløpet av døgnet
+# p1 = []
+# p2 = []
+# p3 = []
+# # w1 = []
+# # w2= []
+# # w3= []
+# # w4= []
+
+# with open('pdop33.json', 'r') as f:
+#     data = json.load(f)
+#     p1 = data[0]
+#     p2 = data[1]
+#     p3 = data[2]
+#     f.close()
+# with open('pdopVaries.json', 'r') as f:
+#     data = json.load(f)
+  
+#     w4 = np.mean(data[2], axis=0)
+#     # # p1 = np.mean(data[0], axis=0)
+#     # # # p2 = data[1]
+#     # # p3 = np.median(data[1], axis=0)
+#     f.close()
+# with open('pdopweaks.json', 'r') as f:
+#     data2 = json.load(f)
+    
+#     w1 = np.mean(data2[0], axis=0)
+#     w2 = np.mean(data2[1], axis=0)
+#     w3 = np.mean(data2[2], axis=0)
+#     f.close()
+
+
+# x_labels = np.linspace(0, 23, 24)
+# # print(len(w1))
+# # print(len(w2))
+# # print(len(w3))
+# # print(len(w4))
+
+# plt.plot(x_labels, p1[:-1], label='Point 1', color='#1f77b4')   # Blå (moderne)
+# plt.plot(x_labels, p2[:-1], label='Point 2', color='#ff7f0e')   # Oransje (myk)
+# plt.plot(x_labels, p3[:-1], label='Point 3', color='#2ca02c')   # Grønn
+
+# plt.plot(x_labels, w1, label='GPS Week 2360', color='#1f77b4')   # Blå
+# plt.plot(x_labels, w2, label='GPS Week 2361', color='#ff7f0e')   # Oransje
+# plt.plot(x_labels, w3, label='GPS Week 2362', color='#2ca02c')   # Grønn
+# plt.plot(x_labels, w4, label='GPS Week 2363', color='#d62728')   # Rød
+
+# plt.gca().set_facecolor('#faf9f6')   # Bakgrunn inni selve plot-området
+# plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
+# plt.xticks(x_labels)  # 👈 VIKTIG: vis ALLE x-ticks!
+# plt.xticks(rotation=45)
+# plt.title('PDOP Values Throught  the Day', fontsize = 20)
+# plt.xlabel('Time of Day (hours)',fontsize=18)
+# plt.ylabel('PDOP value', fontsize=18)
+# plt.legend()
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
 
 # import rasterio
 
