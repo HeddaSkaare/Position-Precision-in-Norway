@@ -4,6 +4,7 @@ from pyproj import Transformer
 import requests
 import pandas as pd
 from shapely.geometry import LineString, Point
+from downloadfile import ensure_raster
 from downloadHoydedata import createNewRaster
 import nvdbapiv3 
 from flask import jsonify
@@ -235,7 +236,7 @@ def get_road_api(startpoint, sluttpoint, vegsystemreferanse):
         #     os.remove("data/merged_raster.tif")
         # createNewRaster(startpoint, sluttpoint)
         # print('utav lager raster')
-
+        ensure_raster()
         return connected_utm, connected_wgs
 
     except Exception as e:

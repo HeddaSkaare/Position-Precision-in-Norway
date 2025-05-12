@@ -2,6 +2,7 @@ import requests
 import gzip
 import logging
 import os
+import gdown
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 folder = os.path.join(CURRENT_DIR, "unzipped")
@@ -55,3 +56,17 @@ def lastned(day, year):
     else:
         print('File Exists')
         return unzipped_path
+
+
+
+
+def ensure_raster():
+    raster_path = os.path.join("data", "merged_raster.tif")
+    if not os.path.exists(raster_path):
+        print("⏬ Laster ned merged_raster.tif fra Google Drive...")
+        os.makedirs("data", exist_ok=True)
+        rasterURL = os.getenv('RASTER_URL')
+        # file_id = "1AbCDefGhIjKlMnOpQrStUvWxYz"  # ← legg inn ID-en fra lenken
+        # url = f"https://drive.google.com/uc?id={file_id}"
+
+        gdown.download(rasterURL, raster_path, quiet=False)
