@@ -73,30 +73,45 @@ export const DOPLineChart = () => {
           let dopData = [];
   
           const readStream = async () => {
-              const decoder = new TextDecoder();
-              while (true) {
-                  const { done, value } = await reader.read();
-                  if (done) break;
-  
-                  const text = decoder.decode(value);
-                  console.log('Received text:', text);
-                  if (text.startsWith('[')) {
-                      try {
-                          dopData = JSON.parse(text);
-                          const array_of_arrays = dopData.map(arr => arr[0]);
-                          setDOP(array_of_arrays);
-                          setUpdateDOP(false);
-                          setIsProcessing(false);
-                      } catch (error) {
-                          console.error('Error parsing DOP data:', error);
-                      }
-                  } else {
-                      const uptprogress = parseInt(text, 10);
-                      setProgress(uptprogress);
-                      console.log(`Progress: ${uptprogress}%`);
-                  }
+            const decoder = new TextDecoder();
+            let buffer = '';
+        
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+        
+                const chunk = decoder.decode(value, { stream: true });
+                buffer += chunk;
+        
+                // Split buffer i linjer (fra backend sin yield f"{...}\n\n")
+                const lines = buffer.split('\n\n');
+        
+                // Behold det siste fragmentet (kan være ufullstendig JSON)
+                buffer = lines.pop();
+        
+                for (const line of lines) {
+                    console.log('Received line:', line);
+                    if (line.startsWith('[')) {
+                        try {
+                            const dopData = JSON.parse(line);
+                            const array_of_arrays = dopData.map(arr => arr[0]);
+                            setDOP(array_of_arrays);
+                            setUpdateDOP(false);
+                            setIsProcessing(false);
+                        } catch (error) {
+                            console.error('Error parsing DOP data:', error);
+                        }
+                    } else {
+                        const uptprogress = parseInt(line, 10);
+                        if (!isNaN(uptprogress)) {
+                            setProgress(uptprogress);
+                            console.log(`Progress: ${uptprogress}%`);
+                        }
+                    }
+                }
               }
           };
+        
   
           readStream();
       })

@@ -135,7 +135,7 @@ def dopValues():
     time = datetime.fromisoformat(time_str)
     daynumber = getDayNumber(time)
     gnss_mapping = get_gnss(daynumber, time.year)
-    total_steps = len(points) + 1
+    total_steps = len(points) 
 
     def generate():
         CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
