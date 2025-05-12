@@ -16,7 +16,10 @@ def sort_elevation_azimuth(elevation):
 #sjekker linjer
 def check_satellite_sight(observer,dem_data,src, max_distance, elevation_satellite, elevation_mask, azimuth_satellite):
     #foreslått måte å finne lengthe nødvendige sjekking
-    
+    print("[DEBUG] dem_data shape:", dem_data.shape, flush=True)
+    print("[DEBUG] dem_data dtype:", dem_data.dtype, flush=True)
+    print("[DEBUG] dem_data max test:", np.nanmax(dem_data), flush=True)
+
     max_dist = int((dem_data.max() -observer[2])/np.tan(np.deg2rad(elevation_mask)))
 
     x,y = observer[0], observer[1]

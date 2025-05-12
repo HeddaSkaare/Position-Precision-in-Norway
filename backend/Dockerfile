@@ -16,3 +16,4 @@ EXPOSE 5000
 # Start appen (bruk gunicorn i produksjon!)
 CMD ["gunicorn", "--worker-class", "gevent", "--timeout", "300", "-b", "0.0.0.0:5000", "app:app"]
 
+
