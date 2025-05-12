@@ -25,8 +25,8 @@ def check_satellite_sight(observer,dem_data,src, max_distance, elevation_satelli
     step_size = 5
     E_lower = src.bounds[0]
     N_upper = src.bounds[3]
-    print(f"[DEBUG] x: {x}, E_lower: {E_lower}", flush=True)
-    print(f"[DEBUG] y: {y}, N_upper: {N_upper}", flush=True)
+    # print(f"[DEBUG] x: {x}, E_lower: {E_lower}", flush=True)
+    # print(f"[DEBUG] y: {y}, N_upper: {N_upper}", flush=True)
     #Viss satelliten uansett er under elevation mask grader
     if elevation_mask > elevation_satellite:
         return False

@@ -99,10 +99,13 @@ def visualCheck_2(satellites, obs_cartesian,observer,observation_lngLat, elevati
         if azimuth < 0:
             azimuth = 360 + azimuth
         #fra generateEvelationMask.py
-
-        if check_satellite_sight(observer, dem_data,src, 5000, elevation, elevation_mask, azimuth):
-            visual_satellites.append([row["X"],row["Y"],row["Z"]])
-            satellite_names.loc[len(satellite_names)] = [row["satelite_id"],row['time'],row["X"],row["Y"],row["Z"], azimuth,zenith]
+        try:
+            if check_satellite_sight(observer, dem_data,src, 5000, elevation, elevation_mask, azimuth):
+                visual_satellites.append([row["X"],row["Y"],row["Z"]])
+                satellite_names.loc[len(satellite_names)] = [row["satelite_id"],row['time'],row["X"],row["Y"],row["Z"], azimuth,zenith]
+        except Exception as e:
+            print(f"[ERROR] Exception in check_satellite_sight: {e}", flush=True)
+            raise  # For å fortsatt kaste det, men nå vet vi hvorfor
     # if step == 1:
     #     print(f'visual_satellites road calc: {satellite_names}')     
 
