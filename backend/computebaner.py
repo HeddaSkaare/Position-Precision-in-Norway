@@ -103,8 +103,8 @@ def visualCheck_2(satellites, obs_cartesian,observer,observation_lngLat, elevati
         if check_satellite_sight(observer, dem_data,src, 5000, elevation, elevation_mask, azimuth):
             visual_satellites.append([row["X"],row["Y"],row["Z"]])
             satellite_names.loc[len(satellite_names)] = [row["satelite_id"],row['time'],row["X"],row["Y"],row["Z"], azimuth,zenith]
-    if step == 1:
-        print(f'visual_satellites road calc: {satellite_names}')     
+    # if step == 1:
+    #     print(f'visual_satellites road calc: {satellite_names}')     
 
     return visual_satellites
 
@@ -170,8 +170,8 @@ def visualCheck_3(satellites, observer_cartesian, observer, observation_lngLat, 
 def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observation_lngLat):
     
     print('in runData_check_sight')
-    process = psutil.Process(os.getpid())
-    print(f"Memory usage: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+    # process = psutil.Process(os.getpid())
+    # print(f"Memory usage: {process.memory_info().rss / 1024 ** 2:.2f} MB")
 
     elevation_mask = float(elevationstring)
 
@@ -217,7 +217,7 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
         for i in range(0,360,1):
             top = check_satellite_sight_2(observation_end,dem_data,src, 5000, elevation_mask, i)
             elevationCutoffs.append(top)
-    print(f"Memory usage after run data: {process.memory_info().rss / 1024 ** 2:.2f} MB") 
+    #print(f"Memory usage after run data: {process.memory_info().rss / 1024 ** 2:.2f} MB") 
     return final_list, final_listdf,elevationCutoffs,observation_cartesian
 
 

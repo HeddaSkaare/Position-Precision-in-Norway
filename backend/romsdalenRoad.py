@@ -144,7 +144,7 @@ def get_road_api(startpoint, sluttpoint, vegsystemreferanse):
         fartsgrenser = nvdbapiv3.nvdbFagdata(105)
         fartsgrenser.filter({'vegsystemreferanse': vegsystemreferanse})
 
-        print('start, slutt', startpoint, sluttpoint)
+        #print('start, slutt', startpoint, sluttpoint)
 
         url = (
             f'https://nvdbapiles-v3.utv.atlas.vegvesen.no/beta/vegnett/rute'

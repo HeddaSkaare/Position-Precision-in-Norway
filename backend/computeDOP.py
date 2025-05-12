@@ -74,12 +74,12 @@ def best(satellites, recieverPos0):
         if(len(satellites_array) > 0):
             GDOP, PDOP, TDOP,HDOP,VDOP = DOPvalues(satellites_array, recieverPos0)
             final_DOP_values.append([GDOP, PDOP, TDOP, HDOP, VDOP])
-            print(PDOP)
+            #print(PDOP)
         else:
             final_DOP_values.append([0, 0, 0, 0, 0])
-    print('final_DOP_values skyplot:', final_DOP_values[0])
-    process = psutil.Process(os.getpid())
-    print(f"Memory usageafter dop calc: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+    #print('final_DOP_values skyplot:', final_DOP_values[0])
+    #process = psutil.Process(os.getpid())
+    #print(f"Memory usageafter dop calc: {process.memory_info().rss / 1024 ** 2:.2f} MB")
     return final_DOP_values
 
 # DOP computation using XYZ-only satellite format
@@ -151,14 +151,14 @@ def find_dop_on_point(dem_data, src, gnss_mapping, gnss, time, point, elevation_
     
     # Compute DOP
     dopvalues = best_2(satellites, obs_cartesian)
-    if step == 1:
+    # if step == 1:
 
-        process = psutil.Process(os.getpid())
-        print("RAM før:", process.memory_info().rss / (1024 * 1024), "MB")
-        print('dop for road:',dopvalues)
-    if step==11:
-        process = psutil.Process(os.getpid())
-        print("RAM etter:", process.memory_info().rss / (1024 * 1024), "MB")  
+    #     process = psutil.Process(os.getpid())
+    #     # print("RAM før:", process.memory_info().rss / (1024 * 1024), "MB")
+    #     # print('dop for road:',dopvalues)
+    # if step==11:
+    #     process = psutil.Process(os.getpid())
+    #     #print("RAM etter:", process.memory_info().rss / (1024 * 1024), "MB")  
     
     return dopvalues
 

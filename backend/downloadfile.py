@@ -34,7 +34,7 @@ def lastned(day, year):
             print("Svar fra serveren:", r.text[:500])
             raise Exception(f"Kunne ikke laste ned fila {filename_gz}. Status: {r.status_code}")
 
-        print("[DEBUG] Response snippet:", r.text[:500], flush=True)
+        #print("[DEBUG] Response snippet:", r.text[:500], flush=True)
 
         with open(gz_path, 'wb') as fd:
             fd.write(r.content)
@@ -63,7 +63,7 @@ def lastned(day, year):
 def ensure_raster():
     raster_path = os.path.join("data", "merged_raster.tif")
     if not os.path.exists(raster_path):
-        print("⏬ Laster ned merged_raster.tif fra Google Drive...")
+        print("Laster ned merged_raster.tif fra Google Drive...")
         os.makedirs("data", exist_ok=True)
         rasterURL = os.getenv('RASTER_URL')
         # file_id = "1AbCDefGhIjKlMnOpQrStUvWxYz"  # ← legg inn ID-en fra lenken
