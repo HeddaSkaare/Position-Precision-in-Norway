@@ -95,8 +95,8 @@ const Visualization = () => {
       if (!updateData) return; 
     
       const filteredGNSS = Object.keys(gnssNames).filter((key) => gnssNames[key]);
-      const searchPoint = points[cosenPoint].geometry.coordinates;
-      
+      //const searchPoint = points[cosenPoint].geometry.coordinates;
+      const searchPoint = [8.087015662313652, 62.31988672814522]
       fetch('http://127.0.0.1:5000/satellites', {
         headers: {
           'Accept': 'application/json',

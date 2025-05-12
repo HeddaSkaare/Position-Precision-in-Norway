@@ -9,21 +9,20 @@ import rasterio
 # Place the downloaded folder inside your project
 
 # Folder containing raster files (change to your path)
-# folder_path = "data/dom10/data/"
+# folder_path = "data/dtm10/data"
 
 # # Find all .tif files in the folder
 # tif_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith(".tif")]
 
 # # Open each raster and store in a list
-# raster_list = []
 
 
-# # Create one large raster by merging all the individual tiles
 # raster_list = []
 # for file in tif_files:
 #     raster = rasterio.open(file)
 #     raster_list.append(raster)
 
+# # Create one large raster by merging all the individual tiles
 # mosaic, out_transform = merge(raster_list)
 
 # # Copy metadata from the first raster file
@@ -36,7 +35,7 @@ import rasterio
 # })
 
 # # Save the merged raster to a file (change the output path as needed)
-# output_path = "data/merged_raster_romsdalen_10.tif"
+# output_path = "data/merged_raster.tif"
 # with rasterio.open(output_path, "w", **out_meta) as dest:
 #     dest.write(mosaic)
 

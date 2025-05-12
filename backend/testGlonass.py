@@ -92,7 +92,8 @@ import pandas as pd
 
 # konfigurasjoner = ["All", "GPS, Galileo, GLONASS", "GPS, Galileo, BeiDou", "GPS, Galileo", "GPS"]
 # pdop_216 = [0.826, 1.008, 0.966, 1.302, 2.052]
-# pdop_127 = [7.582, 7.978, 38.745, 38.975, 0]
+# pdop_127 = [1.121, 1.378, 1.731, 12.532, 0]
+# pdop_142 = [2.818, 4.805, 2.997, 5.537, 6.314]
 
 # # --- 2. LAG STOLPEDIAAGRAM ---
 # plt.figure(figsize=(10, 6))
