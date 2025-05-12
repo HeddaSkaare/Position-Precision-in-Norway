@@ -135,12 +135,15 @@ def dopValues():
     time = datetime.fromisoformat(time_str)
     daynumber = getDayNumber(time)
     gnss_mapping = get_gnss(daynumber, time.year)
-    total_steps = len(points) 
+    total_steps = len(points)
+
+    CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+    raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
 
     def generate():
+        # 🔁 Umiddelbar kontakt
         yield "0\n\n"
-        CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-        raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
+
         dop_list = []
         with rasterio.open(raster_path) as src:
             dem_data = src.read(1)
@@ -156,6 +159,7 @@ def dopValues():
     response.headers["Access-Control-Allow-Origin"] = "https://master-2025.vercel.app"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
+
 
 
 if __name__ == '__main__':
