@@ -121,13 +121,8 @@ def road():
 @app.route('/dopvalues', methods=['POST', 'OPTIONS'])
 def dopValues():
     if request.method == 'OPTIONS':
-        response = jsonify({'status': 'Preflight request passed'})
-        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type, Cache-Control")
-        response.headers.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        return response, 200
+        return jsonify({'status': 'Preflight request passed'}), 200
 
-    # Main POST request handling
     try:
         data = request.get_json()
         time_str = data.get('time').strip('Z')
@@ -137,17 +132,11 @@ def dopValues():
     except Exception as e:
         return jsonify({"error": f"Invalid data format: {e}"}), 400
 
-
     time = datetime.fromisoformat(time_str)
-    
-    #PDOP_list = []
     daynumber = getDayNumber(time)
     gnss_mapping = get_gnss(daynumber, time.year)
     total_steps = len(points) + 1
-    
 
-    # kjør kode
-    
     def generate():
         CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
         raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
@@ -158,16 +147,13 @@ def dopValues():
             for step, point in enumerate(points, start=1):
                 dop_point = find_dop_on_point(dem_data, src, gnss_mapping, gnss, time, point, elevation_angle, step)
                 dop_list.append(dop_point)
-                #PDOP_list.append(dop_point[0][1])
-
                 yield f"{int((step / total_steps) * 100)}\n\n"
-    
-          
-        # Når prosessen er ferdig
+
         yield f"{json.dumps(dop_list)}\n\n"
 
     response = Response(stream_with_context(generate()), content_type='text/event-stream')
-    response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
+    response.headers["Access-Control-Allow-Origin"] = "https://master-2025.vercel.app"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
 
 

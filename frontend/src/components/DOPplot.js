@@ -66,7 +66,7 @@ export const DOPLineChart = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),
-          mode: 'cors'
+          
       })
       .then(response => {
           const reader = response.body.getReader();
