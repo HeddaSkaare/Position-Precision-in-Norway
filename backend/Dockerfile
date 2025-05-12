@@ -14,4 +14,5 @@ RUN pip install --no-cache-dir --upgrade pip \
 EXPOSE 5000
 
 # Start appen (bruk gunicorn i produksjon!)
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "--timeout", "300", "app:app"]
+CMD ["gunicorn", "--worker-class", "gevent", "--timeout", "300", "-b", "0.0.0.0:5000", "app:app"]
+

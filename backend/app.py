@@ -138,6 +138,7 @@ def dopValues():
     total_steps = len(points) 
 
     def generate():
+        yield "0\n\n"
         CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
         raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
         dop_list = []
