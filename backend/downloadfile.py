@@ -1,5 +1,4 @@
 import requests
-from requests.auth import HTTPBasicAuth
 import gzip
 import logging
 import os
@@ -12,46 +11,43 @@ def lastned(day, year):
     filename_gz = f'BRD400DLR_S_{year}{day}0000_01D_MN.rnx.gz'
     filename_unzipped = filename_gz[:-3]  # fjerner .gz
 
-    gz_path = os.path.join(CURRENT_DIR, filename_gz)  # Fila lagres midlertidig i samme mappe som koden
+    gz_path = os.path.join(CURRENT_DIR, filename_gz)
     unzipped_path = os.path.join(folder, filename_unzipped)
 
-    # ✅ Sørg for at mappen for unzipped filer finnes
     os.makedirs(folder, exist_ok=True)
 
     url = f'https://cddis.nasa.gov/archive/gnss/data/daily/{year}/brdc/{filename_gz}'
 
-    user = os.getenv('EARTHDATA_USER')
-    pw = os.getenv('EARTHDATA_PASS')
-    if not user or not pw:
-        raise EnvironmentError("DATA_USERNAME eller DATA_PASSWORD er ikke satt")
+    token = os.getenv('EARTHDATA_TOKEN')
+    if not token:
+        raise EnvironmentError("EARTHDATA_TOKEN er ikke satt i miljøvariabler")
+
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+
     if not os.path.isfile(unzipped_path):
-        authorization = HTTPBasicAuth(user, pw)
-        r = requests.get(url, auth=authorization)
+        r = requests.get(url, headers=headers)
         if r.status_code != 200:
             print("Feil ved nedlasting:", r.status_code)
-            print("Svar fra serveren:", r.text[:500])  # Vis litt av HTML-feilen hvis den finnes
+            print("Svar fra serveren:", r.text[:500])
             raise Exception(f"Kunne ikke laste ned fila {filename_gz}. Status: {r.status_code}")
 
         print("[DEBUG] Response snippet:", r.text[:500], flush=True)
-        print("[DEBUG] usr og pw:", user,pw, flush=True)
 
-        # ✅ Lagre den nedlastede gzip-fila midlertidig
         with open(gz_path, 'wb') as fd:
             fd.write(r.content)
 
-        # ✅ Pakk ut fila
         with open(gz_path, 'rb') as fd:
             try:
-                
                 gzip_fd = gzip.GzipFile(fileobj=fd)
                 data = gzip_fd.read()
             except gzip.BadGzipFile as e:
                 print("Feil ved utpakking av gzip:", e)
                 raise
 
-        os.remove(gz_path)  # ✅ Slett gzip-fila etter utpakking
+        os.remove(gz_path)
 
-        # ✅ Lagre utpakket fil til riktig mappe
         with open(unzipped_path, 'wb') as f:
             f.write(data)
 
@@ -59,8 +55,3 @@ def lastned(day, year):
     else:
         print('File Exists')
         return unzipped_path
-
-
-
-
-    
