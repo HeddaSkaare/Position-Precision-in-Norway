@@ -62,9 +62,11 @@ export const DOPLineChart = () => {
       fetch(`${API_URL}/dopvalues`, {
           method: 'POST',
           headers: {
-              'Content-Type': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          mode: 'cors'
       })
       .then(response => {
           const reader = response.body.getReader();
