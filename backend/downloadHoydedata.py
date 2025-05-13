@@ -9,7 +9,7 @@ import rasterio
 # Place the downloaded folder inside your project
 
 # Folder containing raster files (change to your path)
-# folder_path = "data/dtm10/data"
+# folder_path = "data/dtmNord/data"
 
 # # Find all .tif files in the folder
 # tif_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith(".tif")]
@@ -35,7 +35,7 @@ import rasterio
 # })
 
 # # Save the merged raster to a file (change the output path as needed)
-# output_path = "data/merged_raster.tif"
+# output_path = "data/merged_raster_nord.tif"
 # with rasterio.open(output_path, "w", **out_meta) as dest:
 #     dest.write(mosaic)
 

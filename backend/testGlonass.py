@@ -51,32 +51,32 @@ import pandas as pd
 # gpsGalieoGlonass_data = []
 # with open('dop_dataAll.json', 'r') as f:
 #     data = json.load(f)
-#     all_data = data
+#     all_data = data[1]
 #     f.close()
 # with open('dop_dataGPS.json', 'r') as f:
 #     data = json.load(f)
-#     gps_data = data
+#     gps_data = data[1]
 #     f.close()
 # with open('dop_dataGPSGal.json', 'r') as f:
 #     data = json.load(f)
-#     gpsGalileo_data = data
+#     gpsGalileo_data = data[1]
 #     f.close()
 # with open('dop_dataGPSGalBei.json', 'r') as f:
 #     data = json.load(f)
-#     gpsGalileoBeidou_data = data
+#     gpsGalileoBeidou_data = data[1]
 #     f.close()
 # with open('dop_dataGPSGalGlon.json', 'r') as f:
 #     data = json.load(f)
-#     gpsGalieoGlonass_data = data
+#     gpsGalieoGlonass_data = data[1]
 #     f.close()
 
 # x_labels = np.linspace(0, 22600, 227)
 
-# plt.plot(x_labels, all_data, label='All GNSS', color='#d62728')        # Soft blå1f77b4
-# #plt.plot(x_labels, gps_data, label='GPS', color='#ff7f0e')             # Oransje
-# # plt.plot(x_labels, gpsGalileo_data, label='GPS + Galileo', color='#2ca02c')  # Myk grønn
-# #plt.plot(x_labels, gpsGalileoBeidou_data, label='GPS + Galileo + BeiDou', color='#1f77b4') # Dempet rød
-# plt.plot(x_labels, gpsGalieoGlonass_data, label='GPS + Galileo + GLONASS', color='#9467bd') # Lilla
+#plt.plot(x_labels, all_data, label='All GNSS', color='#d62728')        # Soft blå1f77b4
+#plt.plot(x_labels, gps_data, label='GPS', color='#ff7f0e')             # Oransje
+#plt.plot(x_labels, gpsGalileo_data, label='GPS + Galileo', color='#2ca02c')  # Myk grønn
+#plt.plot(x_labels, gpsGalileoBeidou_data, label='GPS + Galileo + BeiDou', color='#1f77b4') # Dempet rød
+#plt.plot(x_labels, gpsGalieoGlonass_data, label='GPS + Galileo + GLONASS', color='#9467bd') # Lilla
 
 # plt.gca().set_facecolor('#faf9f6')   # Bakgrunn inni selve plot-området
 # plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
@@ -84,7 +84,7 @@ import pandas as pd
 # plt.title('PDOP values along the road segment when using constellations', fontsize = 20)
 # plt.xlabel('Distance along the road (m)', fontsize = 18)
 # plt.ylabel('PDOP value', fontsize = 18)
-# plt.ylim(0, 40)
+# plt.ylim(0, max(gps_data)+1)
 # plt.legend()
 # plt.grid(True)
 # plt.tight_layout()
@@ -97,10 +97,10 @@ import pandas as pd
 
 # # --- 2. LAG STOLPEDIAAGRAM ---
 # plt.figure(figsize=(10, 6))
-# bars = plt.bar(konfigurasjoner, pdop_216, color='#66bb6a', edgecolor='black')
+# bars = plt.bar(konfigurasjoner, pdop_127, color='green', edgecolor='black')
 
 # # --- 3. LEGG TIL VERDIMERKING PÅ TOPPEN ---
-# for bar, val in zip(bars, pdop_216):
+# for bar, val in zip(bars, pdop_127):
 #     if val == 0:
 #         # Legg til verdien på toppen av stolpen
 #         plt.text(bar.get_x() + bar.get_width()/2, val + 0.05, f'None', ha='center', va='bottom', fontsize=16)
@@ -108,10 +108,10 @@ import pandas as pd
 #         plt.text(bar.get_x() + bar.get_width()/2, val + 0.05, f'{val:.3f}', ha='center', va='bottom',fontsize=16)
 
 # # --- 4. FORMATERING ---
-# plt.title("PDOP for Point 216 with Different GNSS Configurations", fontsize=18)
+# plt.title("PDOP for Point 127 with Different GNSS Configurations", fontsize=18)
 # plt.ylabel("PDOP Value", fontsize=18)
 # plt.xticks(rotation=30, ha='right', fontsize=16)
-# plt.ylim(0, max(pdop_216) + 1)
+# plt.ylim(0, max(pdop_127) + 1)
 # plt.grid(axis='y', linestyle='--', alpha=0.7)
 # plt.tight_layout()
 
@@ -129,10 +129,10 @@ import pandas as pd
 
 
 #sammenligne med og uten terreng
-# PDOP_w = []
-# PDOP_wout = []
-# pointLat_list = []
-# pointLon_list = []
+PDOP_w = []
+PDOP_wout = []
+pointLat_list = []
+pointLon_list = []
 
 # with open('PDOP_wTerrain.json', 'r') as f:
 #     data = json.load(f)
@@ -149,14 +149,14 @@ import pandas as pd
 #     PDOP_wout = onluDop
 #     f.close()
 
-# with open('PDOPwithTerrain100m.json', 'r') as f:
-#     data = json.load(f)
-#     PDOP_w = data
-#     f.close()
-# with open('PDOPwithoutTerrain100m.json', 'r') as f:
-#     data = json.load(f)
-#     PDOP_wout = data
-#     f.close()
+with open('PDOPWTerrainDTM100m.json', 'r') as f:
+    data = json.load(f)
+    PDOP_w = data
+    f.close()
+with open('PDOPwithoutTerrain100m.json', 'r') as f:
+    data = json.load(f)
+    PDOP_wout = data
+    f.close()
 # with open('points100.json', 'r') as f:
 #     data = json.load(f)
     
@@ -166,71 +166,78 @@ import pandas as pd
 #     f.close()
 
 
-# x_labels = np.linspace(0, 48000, len(PDOP_w))
-# diff = []
-# for i in range(len(PDOP_w)):
-#     diff.append(PDOP_w[i] - PDOP_wout[i])
+x_labels = np.linspace(0, 48000, len(PDOP_w))
+diff = []
+for i in range(len(PDOP_w)):
+    diff.append(PDOP_w[i] - PDOP_wout[i])
 
 
 # # plt.plot(x_labels, PDOP_w, label='With Terrain Obstruction', color='#1f77b4')        # Soft blå
 # # plt.plot(x_labels, PDOP_wout, label='Without Terrain Obstruction', color='#ff7f0e')             # Oransje
-# plt.plot(x_labels, diff, label='Difference in DOP', color='#ff1493')  # Myk grønn
-
-# plt.gca().set_facecolor('#faf9f6')   # Bakgrunn inni selve plot-området
-# plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
-# plt.xticks(rotation=45)
-# plt.title('PDOP Differences With and Without Terrain Model Integration', fontsize=20)
-# plt.xlabel('Distance along the road (m)',fontsize=18)
-# plt.ylabel('PDOP value', fontsize=18)
-# plt.legend()
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
-
-#sammenligne  sør og nord
-PDOP_sør = []
-PDOP_nord = []
-
-with open('PDOP_nord.json', 'r') as f:
-    data = json.load(f)
-    PDOP_sør = data
-    f.close()
-with open('PDOP_sør.json', 'r') as f:
-    data = json.load(f)
-    PDOP_nord = data
-    f.close()
-
-
-x_labels = np.linspace(0, 7100, 72)
-
-plt.plot(x_labels, PDOP_nord, label='Northern Norway', color='#d62728')        # Soft blå
-plt.plot(x_labels, PDOP_sør[:72], label='Southern Norway ', color='#9467bd')             # Oransje
+plt.plot(x_labels, diff, label='Difference in DOP', color='#ff1493')  # Myk grønn
 
 plt.gca().set_facecolor('#faf9f6')   # Bakgrunn inni selve plot-området
 plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
 plt.xticks(rotation=45)
-plt.title('PDOP Values in South vs North Norway', fontsize = 20)
-plt.xlabel('Points along the road (m)', fontsize = 18)
-plt.ylabel('PDOP value', fontsize = 18)
+plt.title('PDOP Differences With and Without Terrain Model Integration', fontsize=20)
+plt.xlabel('Distance along the road (m)',fontsize=18)
+plt.ylabel('PDOP value', fontsize=18)
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
 
+#sammenligne  sør og nord
+# PDOP_sør = []
+# PDOP_nord = []
+# pointSN_lat = []
+# pointSN_lon = []
+
+# with open('pdopSør_ny.json', 'r') as f:
+#     data = json.load(f)
+#     PDOP_sør = data
+#     f.close()
+# with open('pdopNord_ny.json', 'r') as f:
+#     data = json.load(f)
+#     PDOP_nord = data
+#     f.close()
+# # with open('pointsSouthNorth.json', 'r') as f:
+# #     data = json.load(f)
+# #     for point in data[0]:
+# #         pointSN_lon.append(point[0])
+# #         pointSN_lat.append(point[1])
+# #     f.close()
+
+# x_labels = np.linspace(0, 7100, 72)
+
+# plt.plot(x_labels, PDOP_nord[:72], label='Northern Norway', color='#d62728')        # Soft blå
+# plt.plot(x_labels, PDOP_sør[:72], label='Southern Norway ', color='#9467bd')             # Oransje
+
+# plt.gca().set_facecolor('#faf9f6')   # Bakgrunn inni selve plot-området
+# plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
+# plt.xticks(rotation=45)
+# plt.title('PDOP Values in South vs North Norway', fontsize = 20)
+# plt.xlabel('Points along the road (m)', fontsize = 18)
+# plt.ylabel('PDOP value', fontsize = 18)
+# plt.legend()
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
+
 #sammenligne iløpet av døgnet
 # p1 = []
 # p2 = []
 # p3 = []
-# # w1 = []
-# # w2= []
-# # w3= []
-# # w4= []
+# w1 = []
+# w2= []
+# w3= []
+# w4= []
 
 # with open('pdop33.json', 'r') as f:
 #     data = json.load(f)
-#     p1 = data[0]
-#     p2 = data[1]
-#     p3 = data[2]
+#     p1 = data[1][0]
+#     p2 = data[1][1]
+#     p3 = data[1][3]
 #     f.close()
 # with open('pdopVaries.json', 'r') as f:
 #     data = json.load(f)
@@ -240,12 +247,13 @@ plt.show()
 #     # # # p2 = data[1]
 #     # # p3 = np.median(data[1], axis=0)
 #     f.close()
-# with open('pdopweaks.json', 'r') as f:
+# with open('pdopWeek2.json', 'r') as f:
 #     data2 = json.load(f)
     
 #     w1 = np.mean(data2[0], axis=0)
 #     w2 = np.mean(data2[1], axis=0)
 #     w3 = np.mean(data2[2], axis=0)
+#     w4 = np.mean(data2[3], axis=0)
 #     f.close()
 
 
@@ -255,9 +263,9 @@ plt.show()
 # # print(len(w3))
 # # print(len(w4))
 
-# plt.plot(x_labels, p1[:-1], label='Point 1', color='#1f77b4')   # Blå (moderne)
-# plt.plot(x_labels, p2[:-1], label='Point 2', color='#ff7f0e')   # Oransje (myk)
-# plt.plot(x_labels, p3[:-1], label='Point 3', color='#2ca02c')   # Grønn
+# plt.plot(x_labels, p1, label='Point 1', color='#1f77b4')   # Blå (moderne)
+# plt.plot(x_labels, p2, label='Point 2', color='#ff7f0e')   # Oransje (myk)
+# plt.plot(x_labels, p3, label='Point 3', color='#2ca02c')   # Grønn
 
 # plt.plot(x_labels, w1, label='GPS Week 2360', color='#1f77b4')   # Blå
 # plt.plot(x_labels, w2, label='GPS Week 2361', color='#ff7f0e')   # Oransje
@@ -268,7 +276,7 @@ plt.show()
 # plt.gcf().set_facecolor('#faf9f6')   # Bakgrunn utenfor plot-området (hele figuren)
 # plt.xticks(x_labels)  # 👈 VIKTIG: vis ALLE x-ticks!
 # plt.xticks(rotation=45)
-# plt.title('PDOP Values Throught  the Day', fontsize = 20)
+# plt.title('Mean PDOP Values Throught the Day Over 4 Different Weeks.', fontsize = 20)
 # plt.xlabel('Time of Day (hours)',fontsize=18)
 # plt.ylabel('PDOP value', fontsize=18)
 # plt.legend()
@@ -303,7 +311,7 @@ plt.show()
 # data = {
 #     "lat": pointLat_list,
 #     "lon": pointLon_list,
-#     "pdop": PDOP_wout,
+#     "pdop": PDOP_w,  # Bruker kun de første 72 verdiene for å matche lengden på lat/lon
 # }
 # df = pd.DataFrame(data)
 
@@ -337,4 +345,4 @@ plt.show()
 #     ).add_to(m)
 
 # # --- 4. VIS KART ---
-# m.save("pdop_mapWithout100.html")
+# m.save("pdop_WithTerrain_DTM.html")
