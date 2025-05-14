@@ -80,6 +80,7 @@ def best(satellites, recieverPos0):
     #print('final_DOP_values skyplot:', final_DOP_values[0])
     #process = psutil.Process(os.getpid())
     #print(f"Memory usageafter dop calc: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+    print('[DEBUG]: HAr funnet DOP values')
     return final_DOP_values
 
 # DOP computation using XYZ-only satellite format

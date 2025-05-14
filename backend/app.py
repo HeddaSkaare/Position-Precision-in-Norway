@@ -8,7 +8,9 @@ from datetime import datetime
 from romsdalenRoad import calculate_travel_time, get_road_api
 import rasterio
 import psutil, os
-
+import threading
+import uuid
+import traceback
 distance = None
 points = None
 port = int(os.environ.get("PORT", 5000))
@@ -24,45 +26,93 @@ CORS(app, resources={r"/*": {
     "supports_credentials": True
 }})
 
-@app.route('/satellites', methods=['POST', 'OPTIONS'])
+# @app.route('/satellites', methods=['POST', 'OPTIONS'])
+# def satellites():
+#     if request.method == 'OPTIONS':
+#         # Handle the preflight request with necessary headers
+#         response = jsonify({'status': 'Preflight request passed'})
+#         response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
+#         response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+#         response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+#         return response, 200
+
+#     # Main POST request handling
+#     data = request.json  
+#     time = data.get('time').strip('Z')
+#     elevation_angle = data.get('elevationAngle')
+#     gnss = data.get('GNSS')
+#     epoch = data.get('epoch')
+#     frequency = int(data.get('epochFrequency'))
+#     point = data.get('point')
+#     #print(f'point: {point}')
+    
+#     is_processing = True
+#     list, df,elevation_cutoffs, obs_cartesian = runData_check_sight(gnss, elevation_angle, time, epoch,frequency, point) 
+#     elevation_strings = [str(elevation) for elevation in elevation_cutoffs]
+#     DOPvalues = best(df, obs_cartesian)
+
+#     is_processing = False
+    
+#     if not is_processing:
+#         response = jsonify({'message': 'Data processed successfully', 'data': list, 'DOP': DOPvalues,   'elevation_cutoffs': elevation_strings})
+#         response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*")) 
+#         return response, 200
+#     else:
+#         response = jsonify({"data": "Data is not ready"})
+#         response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
+#         return response, 202
+jobs = {}
+
+@app.route('/satellites', methods=['POST'])
 def satellites():
-    if request.method == 'OPTIONS':
-        # Handle the preflight request with necessary headers
-        response = jsonify({'status': 'Preflight request passed'})
-        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
-        return response, 200
+    data = request.json
+    job_id = str(uuid.uuid4())
+    jobs[job_id] = {"status": "pending", "result": None}
 
-    # Main POST request handling
-    data = request.json  
-    time = data.get('time').strip('Z')
-    elevation_angle = data.get('elevationAngle')
-    gnss = data.get('GNSS')
-    epoch = data.get('epoch')
-    frequency = int(data.get('epochFrequency'))
-    point = data.get('point')
-    #print(f'point: {point}')
-    
-    is_processing = True
-    list, df,elevation_cutoffs, obs_cartesian = runData_check_sight(gnss, elevation_angle, time, epoch,frequency, point) 
-    elevation_strings = [str(elevation) for elevation in elevation_cutoffs]
-    DOPvalues = best(df, obs_cartesian)
+    thread = threading.Thread(target=process_satellite_job, args=(job_id, data))
+    thread.start()
 
-    is_processing = False
-    
-    if not is_processing:
-        response = jsonify({'message': 'Data processed successfully', 'data': list, 'DOP': DOPvalues,   'elevation_cutoffs': elevation_strings})
-        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*")) 
-        return response, 200
-    else:
-        response = jsonify({"data": "Data is not ready"})
-        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
-        return response, 202
+    response = jsonify({"job_id": job_id})
+    origin = request.headers.get("Origin", "*")
+    response.headers.add("Access-Control-Allow-Origin", origin)
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+    response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+    return response, 202
 
+def process_satellite_job(job_id, data):
+    try:
+        # Bruk data['time'], data['GNSS'], osv. her
+        list, df, elevation_cutoffs, obs_cartesian = runData_check_sight(
+            data['GNSS'], data['elevationAngle'], data['time'].strip('Z'),
+            data['epoch'], int(data['epochFrequency']), data['point']
+        )
+        DOPvalues = best(df, obs_cartesian)
+        jobs[job_id]["status"] = "done"
+        jobs[job_id]["result"] = {
+            "list": list,
+            "elevation_cutoffs": [str(e) for e in elevation_cutoffs],
+            "DOP": DOPvalues
+        }
+    except Exception as e:
+        jobs[job_id]["status"] = "error"
+        jobs[job_id]["result"] = {"error": str(e)}
 
-from flask import Flask, request, jsonify
-import traceback
+@app.route('/job-status/<job_id>', methods=['GET'])
+def job_status(job_id):
+    job = jobs.get(job_id)
+    if not job:
+        return jsonify({"error": "Job not found"}), 404
+    return jsonify({"status": job["status"]})
+
+@app.route('/job-result/<job_id>', methods=['GET'])
+def job_result(job_id):
+    job = jobs.get(job_id)
+    if not job:
+        return jsonify({"error": "Job not found"}), 404
+    if job["status"] != "done":
+        return jsonify({"error": "Job not ready"}), 202
+    return jsonify(job["result"])
+
 
 @app.route('/road', methods=['POST', 'OPTIONS'])
 def road():

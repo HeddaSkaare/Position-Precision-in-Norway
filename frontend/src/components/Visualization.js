@@ -92,11 +92,11 @@ const Visualization = () => {
     const [elevation_masks, setElevationMasks] = useState([]);
 
     useEffect(() => {
-      if (!updateData) return; 
+      if (!updateData) return;
     
       const filteredGNSS = Object.keys(gnssNames).filter((key) => gnssNames[key]);
       const searchPoint = points[cosenPoint].geometry.coordinates;
-
+    
       fetch(`${API_URL}/satellites`, {
         headers: {
           'Accept': 'application/json',
@@ -113,29 +113,40 @@ const Visualization = () => {
         }),
         mode: 'cors'
       })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json(); 
-        })
-        .then(data => {
-          console.log("updated", data);
-          setSatellites(fixData(data.data));
-          setElevationMasks(data.elevation_cutoffs);
-          setDOP(data.DOP);
-          setUpdateData(false);
-        })
-        .catch(error => {
-          console.error('Fetch error:', error);
-          console.error('Error name:', error.name);
-          console.error('Error message:', error.message);
-        });
-      
-
-
-    }, [updateData, time, elevationAngle, epoch, gnssNames, setUpdateData, points, epochFrequency, cosenPoint]);
+      .then(res => res.json())
+      .then(({ job_id }) => {
+        // Start polling for result
+        const interval = setInterval(() => {
+          fetch(`${API_URL}/job-status/${job_id}`)
+            .then(res => res.json())
+            .then(statusData => {
+              if (statusData.status === "done") {
+                clearInterval(interval);
     
+                // Get actual result
+                fetch(`${API_URL}/job-result/${job_id}`)
+                  .then(res => res.json())
+                  .then(result => {
+                    console.log("RESULT:", result);
+                    setSatellites(fixData(result.list));
+                    setElevationMasks(result.elevation_cutoffs);
+                    setDOP(result.DOP);
+                    setUpdateData(false);
+                  });
+              } else if (statusData.status === "error") {
+                clearInterval(interval);
+                console.error("Server returned error for job:", job_id);
+                setUpdateData(false);
+              }
+            })
+            .catch(err => {
+              console.error("Polling error:", err);
+              clearInterval(interval);
+              setUpdateData(false);
+            });
+        }, 5000); // Poll hvert 5. sekund
+      });
+    }, [updateData, time, elevationAngle, epoch, gnssNames, setUpdateData, points, epochFrequency, cosenPoint]);
   if (updateData) {
     return <div className="loading_tekst"><p>Loading data...</p></div>;
   }

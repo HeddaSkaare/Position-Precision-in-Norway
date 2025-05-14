@@ -8,6 +8,7 @@ from generateElevationMask import check_satellite_sight, check_satellite_sight_2
 from common_variables import wgs
 import rasterio
 import psutil, os
+from rasterio.windows import from_bounds
 
 # Set up coordinate transformers
 transformer = Transformer.from_crs("EPSG:25833", "EPSG:4326", always_xy=True)
@@ -179,9 +180,10 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
     gnss_mapping = get_gnss(daynumber,given_date.year )
     print("[DEBUG]: har lastet inn data om  satellitene", flush=True) 
     raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
- 
+    
     with rasterio.open(raster_path) as src:
-        dem_data = src.read(1)  
+        
+        dem_data = src.read(1) 
         print("[DEBUG]: har åpnet raster", flush=True) 
         observer_height = dem_data[src.index(observation_EN[0], observation_EN[1])]
         
@@ -192,16 +194,16 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
         final_list = []
         final_listdf = []
 
-        calculations = int(epoch)* int((60/frequency))
+        calculations = int(epoch)* int((60/frequency))+1
         for i in range(0, calculations):
          
             time2 = pd.to_datetime(t)+ pd.Timedelta(minutes=i*frequency)
         
             LGDF_df = []
             for gnss in gnss_list:
-
+                print("[DEBUG]: finner sat pos i GNSS:",gnss, flush=True) 
                 positions = get_satellite_positions(gnss_mapping[gnss],gnss,time2)
-            
+                print("[DEBUG]: finner synlige satelliter i GNSS:",gnss, flush=True) 
                 data = visualCheck_3(positions, observation_cartesian,observation_end, observation_lngLat, elevation_mask, dem_data, src)
                 
                 if not data.empty:
