@@ -77,9 +77,7 @@ def best(satellites, recieverPos0):
             #print(PDOP)
         else:
             final_DOP_values.append([0, 0, 0, 0, 0])
-    #print('final_DOP_values skyplot:', final_DOP_values[0])
-    #process = psutil.Process(os.getpid())
-    #print(f"Memory usageafter dop calc: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+
     print('[DEBUG]: HAr funnet DOP values')
     return final_DOP_values
 
@@ -133,7 +131,7 @@ def best_2(satellites, observer):
 
 # Main function to compute DOP at a specific point in time and location
 def find_dop_on_point(dem_data, src, gnss_mapping, gnss, time, point, elevation_angle, step):
-
+    print('[DEBUG]: kalkulerer dop på step:',step, flush= True)
     # Convert observation point to EN-coordinates and find height from DEM
     observation_point_latlng = point['geometry']['coordinates']
     observation_point_EN = transformerToEN.transform(observation_point_latlng[0], observation_point_latlng[1])  
@@ -152,14 +150,7 @@ def find_dop_on_point(dem_data, src, gnss_mapping, gnss, time, point, elevation_
     
     # Compute DOP
     dopvalues = best_2(satellites, obs_cartesian)
-    # if step == 1:
 
-    #     process = psutil.Process(os.getpid())
-    #     # print("RAM før:", process.memory_info().rss / (1024 * 1024), "MB")
-    #     # print('dop for road:',dopvalues)
-    # if step==11:
-    #     process = psutil.Process(os.getpid())
-    #     #print("RAM etter:", process.memory_info().rss / (1024 * 1024), "MB")  
     
     return dopvalues
 

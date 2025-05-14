@@ -48,78 +48,60 @@ export const DOPLineChart = () => {
     useEffect(() => {
       if (!updateDOP) return;
       setIsProcessing(true);
-  
+    
       const filteredGNSS = Object.keys(gnssNames).filter((key) => gnssNames[key]);
-  
+    
       const payload = {
-          time: time.toISOString(),
-          elevationAngle: elevationAngle.toString(),
-          epoch: epoch.toString(),
-          GNSS: filteredGNSS,  // Already an array, no need to convert to string
-          points: points       // Send directly as an array
+        time: time.toISOString(),
+        elevationAngle: elevationAngle.toString(),
+        epoch: epoch.toString(),
+        GNSS: filteredGNSS,
+        points: points
       };
-  
+    
       fetch(`${API_URL}/dopvalues`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       })
-      .then(response => {
-          const reader = response.body.getReader();
-          let dopData = [];
-  
-          const readStream = async () => {
-            const decoder = new TextDecoder();
-            let buffer = '';
-        
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-        
-                const chunk = decoder.decode(value, { stream: true });
-                buffer += chunk;
-        
-                // Split buffer i linjer (fra backend sin yield f"{...}\n\n")
-                const lines = buffer.split('\n\n');
-        
-                // Behold det siste fragmentet (kan være ufullstendig JSON)
-                buffer = lines.pop();
-        
-                for (const line of lines) {
-                    console.log('Received line:', line);
-                    if (line.startsWith('[')) {
-                        try {
-                            const dopData = JSON.parse(line);
-                            const array_of_arrays = dopData.map(arr => arr[0]);
-                            setDOP(array_of_arrays);
-                            setUpdateDOP(false);
-                            setIsProcessing(false);
-                        } catch (error) {
-                            console.error('Error parsing DOP data:', error);
-                        }
-                    } else {
-                        const uptprogress = parseInt(line, 10);
-                        if (!isNaN(uptprogress)) {
-                            setProgress(uptprogress);
-                            console.log(`Progress: ${uptprogress}%`);
-                        }
-                    }
-                }
+      .then(res => res.json())
+      .then(({ job_id }) => {
+        const interval = setInterval(() => {
+          fetch(`${API_URL}/job-status/${job_id}`)
+            .then(res => res.json())
+            .then(status => {
+              setProgress(status.progress);  // ← 💡 Oppdater state
+      
+              if (status.status === "done") {
+                clearInterval(interval);
+                fetch(`${API_URL}/job-result/${job_id}`)
+                  .then(res => res.json())
+                  .then(result => {
+                    const array_of_arrays = result.dopvalues.map(arr => arr[0]);
+                    setDOP(array_of_arrays);
+                    setUpdateDOP(false);
+                    setIsProcessing(false);
+                  });
+              } else if (status.status === "error") {
+                clearInterval(interval);
+                console.error("Error in DOP job");
+                setUpdateDOP(false);
+                setIsProcessing(false);
               }
-          };
-        
-  
-          readStream();
-      })
-      .catch(error => {
-          console.error('Error:', error);
+            })
+            .catch(err => {
+              clearInterval(interval);
+              console.error("Polling error:", err);
+              setUpdateDOP(false);
+              setIsProcessing(false);
+            });
+        }, 3000); // Poll hvert 3. sekund
       });
-  }, [updateDOP, gnssNames, elevationAngle, time, epoch, points, setUpdateDOP]);
-
+    }, [updateDOP, gnssNames, elevationAngle, time, epoch, points, setUpdateDOP]);
+    
     
     const handleUpdateDOP = () => {
         setUpdateDOP(true);

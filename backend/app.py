@@ -102,7 +102,12 @@ def job_status(job_id):
     job = jobs.get(job_id)
     if not job:
         return jsonify({"error": "Job not found"}), 404
-    return jsonify({"status": job["status"]})
+
+    return jsonify({
+        "status": job["status"],
+        "progress": job.get("progress", 0)
+    })
+
 
 @app.route('/job-result/<job_id>', methods=['GET'])
 def job_result(job_id):
@@ -166,49 +171,88 @@ def road():
         response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
         return response, 500
 
-    
-    
-@app.route('/dopvalues', methods=['POST', 'OPTIONS'])
-def dopValues():
-    if request.method == 'OPTIONS':
-        return jsonify({'status': 'Preflight request passed'}), 200
+@app.route('/dopvalues', methods=['POST'])
+def dopvalues():
+    data = request.get_json()
+    job_id = str(uuid.uuid4())
+    jobs[job_id] = {"status": "pending", "result": None}
 
+    thread = threading.Thread(target=process_dopvalues_job, args=(job_id, data))
+    thread.start()
+
+    return jsonify({"job_id": job_id}), 202
+
+def process_dopvalues_job(job_id, data):
     try:
-        data = request.get_json()
         time_str = data.get('time').strip('Z')
         elevation_angle = data.get('elevationAngle')
         gnss = data.get('GNSS')
         points = data.get('points')
-    except Exception as e:
-        return jsonify({"error": f"Invalid data format: {e}"}), 400
+        
+        time = datetime.fromisoformat(time_str)
+        daynumber = getDayNumber(time)
+        gnss_mapping = get_gnss(daynumber, time.year)
 
-    time = datetime.fromisoformat(time_str)
-    daynumber = getDayNumber(time)
-    gnss_mapping = get_gnss(daynumber, time.year)
-    total_steps = len(points)
-
-    CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-    raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
-
-    def generate():
-        # 🔁 Umiddelbar kontakt
-        yield "0\n\n"
-
+        raster_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "merged_raster.tif")
         dop_list = []
+
         with rasterio.open(raster_path) as src:
             dem_data = src.read(1)
-
+            total_steps = len(points)
             for step, point in enumerate(points, start=1):
                 dop_point = find_dop_on_point(dem_data, src, gnss_mapping, gnss, time, point, elevation_angle, step)
                 dop_list.append(dop_point)
-                yield f"{int((step / total_steps) * 100)}\n\n"
+                progress = int((step / total_steps) * 100)
+                jobs[job_id]["progress"] = progress  # 💡 Progress-tracking
 
-        yield f"{json.dumps(dop_list)}\n\n"
+        jobs[job_id]["status"] = "done"
+        jobs[job_id]["result"] = {"dopvalues": dop_list}
+    except Exception as e:
+        jobs[job_id]["status"] = "error"
+        jobs[job_id]["result"] = {"error": str(e)}
+  
+    
+# @app.route('/dopvalues', methods=['POST', 'OPTIONS'])
+# def dopValues():
+#     if request.method == 'OPTIONS':
+#         return jsonify({'status': 'Preflight request passed'}), 200
 
-    response = Response(stream_with_context(generate()), content_type='text/event-stream')
-    response.headers["Access-Control-Allow-Origin"] = "https://master-2025.vercel.app"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    return response
+#     try:
+#         data = request.get_json()
+#         time_str = data.get('time').strip('Z')
+#         elevation_angle = data.get('elevationAngle')
+#         gnss = data.get('GNSS')
+#         points = data.get('points')
+#     except Exception as e:
+#         return jsonify({"error": f"Invalid data format: {e}"}), 400
+
+#     time = datetime.fromisoformat(time_str)
+#     daynumber = getDayNumber(time)
+#     gnss_mapping = get_gnss(daynumber, time.year)
+#     total_steps = len(points)
+
+#     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+#     raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
+
+#     def generate():
+#         # 🔁 Umiddelbar kontakt
+#         yield "0\n\n"
+
+#         dop_list = []
+#         with rasterio.open(raster_path) as src:
+#             dem_data = src.read(1)
+
+#             for step, point in enumerate(points, start=1):
+#                 dop_point = find_dop_on_point(dem_data, src, gnss_mapping, gnss, time, point, elevation_angle, step)
+#                 dop_list.append(dop_point)
+#                 yield f"{int((step / total_steps) * 100)}\n\n"
+
+#         yield f"{json.dumps(dop_list)}\n\n"
+
+#     response = Response(stream_with_context(generate()), content_type='text/event-stream')
+#     response.headers["Access-Control-Allow-Origin"] = "https://master-2025.vercel.app"
+#     response.headers["Access-Control-Allow-Credentials"] = "true"
+#     return response
 
 
 
