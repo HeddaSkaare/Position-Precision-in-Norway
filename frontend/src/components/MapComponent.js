@@ -155,7 +155,7 @@ const NavMap = () => {
                 
               }
             });
-        }, 3000); // poll hvert 3. sek
+        }, 1000); // poll hvert 1. sek
       })
       .catch(error => {
         console.error("Road fetch error:", error);

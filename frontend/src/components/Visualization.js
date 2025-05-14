@@ -144,7 +144,7 @@ const Visualization = () => {
               clearInterval(interval);
               setUpdateData(false);
             });
-        }, 5000); // Poll hvert 5. sekund
+        }, 3000); // Poll hvert 5. sekund
       });
     }, [updateData, time, elevationAngle, epoch, gnssNames, setUpdateData, points, epochFrequency, cosenPoint]);
   
@@ -152,7 +152,7 @@ const Visualization = () => {
     return <div className="loading_tekst">    
       <p>
         Loading data...<br />
-        This can take some time because the satellite data has to be downloaded.
+        This can take some time, depending on the calculation interval and length of epoch.
       </p>
     </div>;
   }
