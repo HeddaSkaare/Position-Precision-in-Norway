@@ -170,31 +170,28 @@ def visualCheck_3(satellites, observer_cartesian, observer, observation_lngLat, 
 def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observation_lngLat):
     
     print('in runData_check_sight')
-    # process = psutil.Process(os.getpid())
-    # print(f"Memory usage: {process.memory_info().rss / 1024 ** 2:.2f} MB")
 
     elevation_mask = float(elevationstring)
 
-    
     observation_EN = transformerToEN.transform(observation_lngLat[0], observation_lngLat[1])
     given_date = datetime.strptime(t, "%Y-%m-%dT%H:%M:%S.%f")
     daynumber = getDayNumber(given_date)
     gnss_mapping = get_gnss(daynumber,given_date.year )
-
+    print("[DEBUG]: har lastet inn data om  satellitene", flush=True) 
     raster_path = os.path.join(CURRENT_DIR, "data", "merged_raster.tif")
-    #observation_cartesian = []
+ 
     with rasterio.open(raster_path) as src:
         dem_data = src.read(1)  
-
+        print("[DEBUG]: har åpnet raster", flush=True) 
         observer_height = dem_data[src.index(observation_EN[0], observation_EN[1])]
-        #print(f'observer: {observation_lngLat}, {observer_height}')
+        
         observation_cartesian = Cartesian(observation_lngLat[1]* np.pi/180, observation_lngLat[0]* np.pi/180, observer_height)
         observation_end = [observation_EN[0], observation_EN[1], observer_height]
 
         elevationCutoffs = []
         final_list = []
         final_listdf = []
-        #print('finds visual satellites')
+
         calculations = int(epoch)* int((60/frequency))
         for i in range(0, calculations):
          
@@ -213,11 +210,12 @@ def runData_check_sight(gnss_list, elevationstring, t, epoch, frequency,observat
             final_list.append([df.to_dict() for df in LGDF_df])
             final_listdf.append(LGDF_df)
        
-        
+        print("[DEBUG]: har iterert gjennom hver epoke og kalkulert satellitposisjoene", flush=True) 
         for i in range(0,360,1):
             top = check_satellite_sight_2(observation_end,dem_data,src, 5000, elevation_mask, i)
             elevationCutoffs.append(top)
-    #print(f"Memory usage after run data: {process.memory_info().rss / 1024 ** 2:.2f} MB") 
+        print("[DEBUG]: har funnet terreng avgrensing", flush=True) 
+
     return final_list, final_listdf,elevationCutoffs,observation_cartesian
 
 

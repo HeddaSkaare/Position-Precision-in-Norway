@@ -546,7 +546,7 @@ def sortData(daynumber, date):
     file_pathG = os.path.join(output_folder, "structured_dataG.csv")
 
     if os.path.exists(file_pathG):
-        print(f"Data on day {daynumber} already sorted")
+        print(f"Data on day {daynumber} already sorted", flush=True)
         return
     else:
         # ---- Last ned og pakk ut ----
@@ -567,7 +567,7 @@ def sortData(daynumber, date):
         structured_dataS = pd.DataFrame(columns=columnsS)
 
         with open(filepath, "r") as file:
-            print(f"Reading file {filepath}")
+            print(f"Reading file {filepath}", flush=True)
             content = file.read()
 
         split_index = content.index("END OF HEADER")
@@ -622,7 +622,7 @@ def sortData(daynumber, date):
                 elif "E" in satellitt_id:
                     Galileiodata(structured_dataE, satellitt_id, time, values_list, SV, type)
 
-        print(f"Processing at {time}")
+        
 
         # Oppdater navigation type for noen systemer
         structured_dataJ = update_navigation_message_type(structured_dataJ)
