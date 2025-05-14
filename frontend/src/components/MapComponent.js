@@ -8,9 +8,10 @@ import customMarkerIcon from '../assets/pngwing.png';
 import A from '../assets/A.png';
 import B from '../assets/B.png';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import {startPointState, endPointState, distanceState, roadState,pointsState, vegReferanseState, geoJsonDataState,API_URL} from '../states/states';
+import {startPointState, endPointState, distanceState, roadState,pointsState, vegReferanseState, geoJsonDataState,API_URL,roadProgressState} from '../states/states';
 import '../css/map.css';
 import proj4 from 'proj4';
+import FitMapToGeoJson from '../components/FitMapToGeoJson';
 
 // Define WGS84 (latitude/longitude) and UTM Zone 33 (Easting/Northing)
 proj4.defs("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
@@ -103,6 +104,7 @@ const NavMap = () => {
   const [updateRoad,setUpdateRoad] = useAtom(roadState);
   const [markers, setMarkers] = useAtom(pointsState);
   const [geoJsonData, setGeoJsonData] = useAtom(geoJsonDataState);
+  const [roadprogress, setRoadProgress] = useAtom(roadProgressState)
   
   const [startMarker, setStartMarker] = useState(null);
   const [endMarker, setEndMarker] = useState(null);
@@ -111,9 +113,8 @@ const NavMap = () => {
 
   const fetchRoadData = useCallback(() => {
     if (geoJsonData != null || !updateRoad) return;
-  
-    console.log("startPoint", startPoint);
-    console.log("endPoint", endPoint);
+    
+    setRoadProgress(0);
   
     fetch(`${API_URL}/road`, {
       headers: {
@@ -129,23 +130,37 @@ const NavMap = () => {
       }),
       mode: 'cors',
     })
-      .then(async (response) => {
-        const data = await response.json();   // <<=== LEST ALLTID JSON
-        if (!response.ok) {
-          throw new Error(data.message || 'Network response was not ok');  // <<=== KAST etter å ha lest data
-        }
-        console.log("road", data.road);
-        console.log("points", data.points);
-        setGeoJsonData(data.road);
-        setMarkers(data.points);
-        setUpdateRoad(false);
+      .then(res => res.json())
+      .then(({ job_id }) => {
+        const interval = setInterval(() => {
+          fetch(`${API_URL}/job-status/${job_id}`)
+            .then(res => res.json())
+            .then(status => {
+              setRoadProgress(status.progress || 0);
+  
+              if (status.status === "done") {
+                clearInterval(interval);
+                fetch(`${API_URL}/job-result/${job_id}`)
+                  .then(res => res.json())
+                  .then(result => {
+                    setGeoJsonData(result.road);
+                    setMarkers(result.points);
+                    setUpdateRoad(false);
+                    
+                  });
+              } else if (status.status === "error") {
+                clearInterval(interval);
+                alert("An error occures.Please Tyr again.");
+                setUpdateRoad(false);
+                
+              }
+            });
+        }, 3000); // poll hvert 3. sek
       })
       .catch(error => {
-        console.error('Fetch error road:', error);
-        console.error('Error name road:', error.name);
-        console.error('Error message road:', error.message);
+        console.error("Road fetch error:", error);
         setUpdateRoad(false);
-        alert(error.message);  // Nå får du faktisk den riktige meldingen fra Flask!
+        
       });
   }, [geoJsonData, updateRoad, startPoint, endPoint, distance, setGeoJsonData, setUpdateRoad, vegreferanse, setMarkers]);
   
@@ -226,6 +241,7 @@ const NavMap = () => {
           ))
         ):null
       }
+      <FitMapToGeoJson geoJsonData={geoJsonData} />
     </MapContainer>
     {markers.length > 0 ? 
       (<button className="clear-road-button" onClick={handleClearRoad}>

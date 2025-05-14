@@ -1,7 +1,8 @@
 import React from 'react';
-import { useAtom } from 'jotai';
-import {elevationState,timeState, gnssState, epochState, startPointState, endPointState, distanceState, roadState, vegReferanseState,geoJsonDataState, epochFrequencyState} from '../states/states';
+import { useAtom, useAtomValue } from 'jotai';
+import {elevationState,timeState, gnssState, epochState, startPointState, endPointState, distanceState, roadState, vegReferanseState,geoJsonDataState, epochFrequencyState,roadProgressState} from '../states/states';
 import '../css/filtering.css';
+import { useState } from 'react';
 
 
 const FilterComponent = () => {
@@ -17,7 +18,10 @@ const FilterComponent = () => {
   const [updateRoad,setUpdateRoad] = useAtom(roadState);
   const [geoJsonData, setGeoJsonData] = useAtom(geoJsonDataState);
   const [epochFrequency, setEpochFrequency] = useAtom(epochFrequencyState);
+  const progressRoad = useAtomValue(roadProgressState);
 
+  const [startInput, setStartInput] = useState(startPoint);
+  const [endInput, setEndInput] = useState(endPoint);
   const handleCheckboxChange = (e) => {
     setGnssNames({
       ...gnssNames,
@@ -46,16 +50,36 @@ const FilterComponent = () => {
   const handleHourChange = (event) => {
     setHours(event.target.value);
   };
+
   const handleSetStartPoint = (event) => {
     const input = event.target.value;
+    setStartInput(input); // ← oppdater inputfeltet uansett
+  
+    if (input.trim() === "") {
+      setStartPoint(null);
+      return;
+    }
+  
     const coordinates = input.split(',').map(coord => parseFloat(coord.trim()));
-    setStartPoint(coordinates);
+    if (coordinates.length === 2 && coordinates.every(coord => !isNaN(coord))) {
+      setStartPoint(coordinates);
+    }
   };
   const handleSetEndPoint = (event) => {
     const input = event.target.value;
+    setEndInput(input);
+  
+    if (input.trim() === "") {
+      setEndPoint(null);
+      return;
+    }
+  
     const coordinates = input.split(',').map(coord => parseFloat(coord.trim()));
-    setEndPoint(coordinates);
+    if (coordinates.length === 2 && coordinates.every(coord => !isNaN(coord))) {
+      setEndPoint(coordinates);
+    }
   };
+  
   return (
     <>
     <div className="filter-header">
@@ -91,7 +115,7 @@ const FilterComponent = () => {
             <h4 className="road-comps-header">Start Point (E,N)</h4>
             <input
               type="text"
-              value={startPoint}
+              value={startInput}
               onChange={handleSetStartPoint}
               placeholder="Enter point E,N ..."
               className='road-input3'
@@ -102,7 +126,7 @@ const FilterComponent = () => {
             <h4 className="road-comps-header">End Point (E,N)</h4>
             <input
               type="text"
-              value={endPoint}
+              value={endInput}
               onChange={handleSetEndPoint}
               placeholder="Enter point E,N..."
               className='road-input3'
@@ -117,6 +141,8 @@ const FilterComponent = () => {
             >
               {updateRoad ? '' : 'Find Road'}
             </button>
+            {updateRoad ? <p>Henter vei ... {progressRoad}%</p> : ''}
+            
           </div>
         </div>
       

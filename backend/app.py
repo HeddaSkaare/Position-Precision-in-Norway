@@ -118,58 +118,112 @@ def job_result(job_id):
         return jsonify({"error": "Job not ready"}), 202
     return jsonify(job["result"])
 
-
-@app.route('/road', methods=['POST', 'OPTIONS'])
+@app.route('/road', methods=['POST'])
 def road():
-    if request.method == 'OPTIONS':
-        # Handle the preflight request (CORS preflight)
-        response = jsonify({'status': 'Preflight request passed'})
-        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
-        return response, 200
+    data = request.get_json()
+    job_id = str(uuid.uuid4())
+    jobs[job_id] = {
+        "status": "pending",
+        "progress": 0,
+        "result": None,
+        "type": "road"
+    }
 
+    thread = threading.Thread(target=process_road_job, args=(job_id, data))
+    thread.start()
+
+    return jsonify({"job_id": job_id}), 202
+
+def process_road_job(job_id, data):
     try:
-        vegReferanse = request.json.get('vegReferanse')
-        startPoint = request.json.get('startPoint')
-        endPoint = request.json.get('endPoint')
-        distance = request.json.get('distance')
+        vegReferanse = data.get('vegReferanse')
+        startPoint = data.get('startPoint')
+        endPoint = data.get('endPoint')
+        distance = data.get('distance')
 
-        # Validate input
         if not vegReferanse or not startPoint or not endPoint or not distance:
-            response = jsonify({'error': 'Missing input parameters.', 'message': 'Please provide startPoint, endPoint, distance and vegReferanse.'})
-            response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
-            return response, 400
+            jobs[job_id]["status"] = "error"
+            jobs[job_id]["result"] = {
+                'error': 'Missing input parameters.',
+                'message': 'Please provide startPoint, endPoint, distance and vegReferanse.'
+            }
+            return
 
-        # Get road data
+        jobs[job_id]["progress"] = 10  # optional progress feedback
+
         road_utm, road_wgs = get_road_api(startPoint, endPoint, vegReferanse)
+        jobs[job_id]["progress"] = 50
 
-        # Calculate points
         points = calculate_travel_time(road_utm, float(distance))
+        jobs[job_id]["progress"] = 90
 
-        response = jsonify({'message': 'Data processed successfully', 'road': road_wgs, 'points': points})
-        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
-        return response, 200
-
-    except IndexError as e:
-        response = jsonify({
-            'error': 'No road data found for the given input.',
-            'details': str(e),
-            'message': 'The road couldn’t be found. Please check all the input parameters and be more specific with the start and end markers.'
-        })
-        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
-        return response, 400
-
+        jobs[job_id]["status"] = "done"
+        jobs[job_id]["result"] = {
+            'message': 'Data processed successfully',
+            'road': road_wgs,
+            'points': points
+        }
     except Exception as e:
-        # Log full error in backend
+        import traceback
         print(traceback.format_exc())
-        response = jsonify({
-            'error': 'An unexpected error occurred.',
+        jobs[job_id]["status"] = "error"
+        jobs[job_id]["result"] = {
+            'error': 'Unexpected error',
             'details': str(e),
             'message': 'An unexpected error occurred. Please try again later.'
-        })
-        response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
-        return response, 500
+        }
+
+# @app.route('/road', methods=['POST', 'OPTIONS'])
+# def road():
+#     if request.method == 'OPTIONS':
+#         # Handle the preflight request (CORS preflight)
+#         response = jsonify({'status': 'Preflight request passed'})
+#         response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
+#         response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+#         response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+#         return response, 200
+
+#     try:
+#         vegReferanse = request.json.get('vegReferanse')
+#         startPoint = request.json.get('startPoint')
+#         endPoint = request.json.get('endPoint')
+#         distance = request.json.get('distance')
+
+#         # Validate input
+#         if not vegReferanse or not startPoint or not endPoint or not distance:
+#             response = jsonify({'error': 'Missing input parameters.', 'message': 'Please provide startPoint, endPoint, distance and vegReferanse.'})
+#             response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
+#             return response, 400
+
+#         # Get road data
+#         road_utm, road_wgs = get_road_api(startPoint, endPoint, vegReferanse)
+
+#         # Calculate points
+#         points = calculate_travel_time(road_utm, float(distance))
+
+#         response = jsonify({'message': 'Data processed successfully', 'road': road_wgs, 'points': points})
+#         response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
+#         return response, 200
+
+#     except IndexError as e:
+#         response = jsonify({
+#             'error': 'No road data found for the given input.',
+#             'details': str(e),
+#             'message': 'The road couldn’t be found. Please check all the input parameters and be more specific with the start and end markers.'
+#         })
+#         response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
+#         return response, 400
+
+#     except Exception as e:
+#         # Log full error in backend
+#         print(traceback.format_exc())
+#         response = jsonify({
+#             'error': 'An unexpected error occurred.',
+#             'details': str(e),
+#             'message': 'An unexpected error occurred. Please try again later.'
+#         })
+#         response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin", "*"))
+#         return response, 500
 
 @app.route('/dopvalues', methods=['POST'])
 def dopvalues():
