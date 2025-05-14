@@ -47,3 +47,4 @@ export const gnssState2 = atom({
     NavIC: false,
 
   })
+export const roadProgressState = atom(0)
