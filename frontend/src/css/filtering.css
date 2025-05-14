@@ -352,12 +352,23 @@ h3 {
 }
 
 .road-button-container {
-  grid-column: span 2;
+  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 10px;
 }
+.button-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progress-text {
+  margin-top: 8px;
+  font-size: 20px;
+}
+
 .searchButtonContainer{
   display: flex;
   justify-content: center;

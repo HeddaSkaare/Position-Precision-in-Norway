@@ -149,7 +149,12 @@ const Visualization = () => {
     }, [updateData, time, elevationAngle, epoch, gnssNames, setUpdateData, points, epochFrequency, cosenPoint]);
   
   if (updateData) {
-    return <div className="loading_tekst"><p>Loading data...This can take some time because the satellites data has to be downloaded.</p></div>;
+    return <div className="loading_tekst">    
+      <p>
+        Loading data...<br />
+        This can take some time because the satellite data has to be downloaded.
+      </p>
+    </div>;
   }
 
   if (error) {

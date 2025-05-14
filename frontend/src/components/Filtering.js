@@ -134,16 +134,21 @@ const FilterComponent = () => {
           </div>
       
           <div className="road-button-container">
-            <button
-              className={`searchButton ${updateRoad ? 'loading' : ''}`}
-              onClick={handleUpdateRoad}
-              disabled={updateRoad}
-            >
-              {updateRoad ? '' : 'Find Road'}
-            </button>
-            {updateRoad ? <p>Henter vei ... {progressRoad}%</p> : ''}
-            
+            <div className="button-wrapper">
+              <button
+                className={`searchButton ${updateRoad ? 'loading' : ''}`}
+                onClick={handleUpdateRoad}
+                disabled={updateRoad}
+              >
+                {updateRoad ? '' : 'Find Road'}
+              </button>
+
+              {updateRoad && (
+                <p>Generating road ... {progressRoad}%</p>
+              )}
+            </div>
           </div>
+
         </div>
       
         <div className='satellite-comps'>

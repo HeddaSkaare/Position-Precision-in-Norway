@@ -256,14 +256,19 @@ export const DOPLineChart = () => {
             <button className={`searchButton ${updateDOP ? 'loading' : ''}`} onClick={handleUpdateDOP} disabled={updateDOP}>{updateDOP ? '' : 'Find DOP Line Chart'}</button>
         </div>
         {/* Loading Bar */}
+        {/* {isProcessing &&(
+
+            <p className='loading-text'>This This process takes very long time.</p>
+
+        )} */}
         {isProcessing && (
             <div className='loadingbar'>
-            <div className='progress'
-              style={{width: `${progress}%`}}>
-            </div>
-            <div className='progress-text'>
-              {progress}%
-            </div>
+              <div className='progress'
+                style={{width: `${progress}%`}}>
+              </div>
+              <div className='progress-text'>
+                {progress}%
+              </div>
             </div>
         )}
       {/* DOP line Chart Along Road */}
