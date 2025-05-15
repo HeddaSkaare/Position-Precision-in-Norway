@@ -98,7 +98,7 @@ export const DOPLineChart = () => {
               setUpdateDOP(false);
               setIsProcessing(false);
             });
-        }, 3000); // Poll hvert 3. sekund
+        }, 10000); // Poll hvert 3. sekund
       });
     }, [updateDOP, gnssNames, elevationAngle, time, epoch, points, setUpdateDOP]);
     
