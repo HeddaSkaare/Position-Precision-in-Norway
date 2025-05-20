@@ -5,6 +5,7 @@ import '../css/filtering.css';
 import { useState } from 'react';
 
 
+
 const FilterComponent = () => {
   const [gnssNames, setGnssNames] = useAtom(gnssState);
   const [elevationAngle, setElevationAngle] = useAtom(elevationState)
@@ -150,7 +151,7 @@ const FilterComponent = () => {
           </div>
 
         </div>
-      
+        
         <div className='satellite-comps'>
           <div className="checkbox-group">
             <h4 className="checkbox-title">GNSS Names</h4>
@@ -184,7 +185,8 @@ const FilterComponent = () => {
                 <p><b>Elevation Angle</b> {elevationAngle}°</p>
               </div>
               <input
-                className='elevation-angle-slider'
+                // className='elevation-angle-slider'
+                className='uniform-slider'
                 type="range"
                 min="10"
                 max="90"
@@ -199,6 +201,7 @@ const FilterComponent = () => {
                 <p><b>Time Epoch</b> {hours} h</p>
               </div>
               <input
+                className='uniform-slider'
                 type="range"
                 min="0"
                 max="48"
@@ -210,6 +213,7 @@ const FilterComponent = () => {
                 <p><b>Calculation Interval</b> every {epochFrequency} min</p>
               </div>
               <input
+                className='uniform-slider'
                 type="range"
                 min="10"
                 max="60"
