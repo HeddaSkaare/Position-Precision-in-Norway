@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents,GeoJSON } from 'react-leaflet';
+import React, { useState, useEffect, useCallback , useRef} from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents,GeoJSON,ScaleControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import { OpenStreetMapProvider, GeoSearchControl } from 'leaflet-geosearch';
@@ -12,6 +12,7 @@ import {startPointState, endPointState, distanceState, roadState,pointsState, ve
 import '../css/map.css';
 import proj4 from 'proj4';
 import FitMapToGeoJson from '../components/FitMapToGeoJson';
+
 
 // Define WGS84 (latitude/longitude) and UTM Zone 33 (Easting/Northing)
 proj4.defs("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
@@ -168,6 +169,8 @@ const NavMap = () => {
     fetchRoadData();
   }, [fetchRoadData]);
 
+
+
   const handleClearRoad = (e) => {
     setEndMarker(null);
     setStartMarker(null);
@@ -180,11 +183,16 @@ const NavMap = () => {
 
   return (
   <div className="map" >
-    <MapContainer center={position} zoom={9} style={{ height: '400px', width: '100%', borderRadius: '10px' }}>
+    <MapContainer
+      center={position}
+      zoom={9}
+      style={{ height: '400px', width: '100%', borderRadius: '10px' }}
+    >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
+      <ScaleControl position="bottomleft" imperial={false} />
       <ClickableMap
         setStartMarker={setStartMarker}
         setEndMarker={setEndMarker}
