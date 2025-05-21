@@ -15,6 +15,11 @@ from flask import jsonify
 transformer = Transformer.from_crs("EPSG:25833", "EPSG:4326", always_xy=True)
 transformerToEN = Transformer.from_crs("EPSG:4326","EPSG:25833", always_xy=True)
 
+def calculate_distance(coord1, coord2):
+    """
+    Calculate the Euclidean distance between two coordinates.
+    """
+    return np.sqrt((coord1[0] - coord2[0])**2 + (coord1[1] - coord2[1])**2)
 # Convert WKT LINESTRING Z to coordinate array in WGS84
 def linestring_to_coordinates(linestring):
     wkt_string = linestring.replace("LINESTRING Z(", "").replace(")", "")
@@ -170,16 +175,18 @@ def get_road_api(startpoint, sluttpoint, vegsystemreferanse):
         if not segmenter:
             raise IndexError("No road segments found for the given input. Most likely you have to be more specific with the start and end point. Check that you have the correcr Road reference system.")
 
-        startveg = segmenter[0]
+        
 
         df = pd.DataFrame(fartsgrenser.to_records()).query("typeVeg == 'Enkel bilveg'")
-
-        i = 0
         retning = 'MED'
-        if 'sluttnode' in startveg:
-            retning = 'MED'
-        if 'startnode' in startveg:
-            retning = 'MOT'
+        i = 0
+        if len(segmenter) > 1:
+            startveg = segmenter[0]
+            # if 'sluttnode' in startveg:
+            #     retning = 'MED'
+            if 'startnode' in startveg:
+                retning = 'MOT'
+                segmenter.reverse()
 
         total_vegsegment_wgs84 = []
         total_vegsegment_utm = []
@@ -189,7 +196,15 @@ def get_road_api(startpoint, sluttpoint, vegsystemreferanse):
                 fartsgrense_row = df[df['veglenkesekvensid'] == veglenke['veglenkesekvensid']]['Fartsgrense']
                 fartsgrense = float(fartsgrense_row.iloc[0]) if not fartsgrense_row.empty else 50.0
                 converted = linestring_to_coordinates(veglenke['geometri']['wkt'])
-
+                if len(segmenter) == 1:
+                    #må finne om vegsegmentet har retning mot eller med satrt og sluttnode
+                    startpointfirst_coord = converted[0]
+                    startpointLatLng = transformer.transform(startpoint[0], startpoint[1])
+                    endpointLatLng = transformer.transform(sluttpoint[0], sluttpoint[1])
+                    dist_start = calculate_distance(startpointfirst_coord, startpointLatLng)
+                    dist_end = calculate_distance(startpointfirst_coord, endpointLatLng)
+                    if dist_start > dist_end:
+                        retning = 'MOT'
                 if retning == 'MOT':
                     converted.reverse()
 
