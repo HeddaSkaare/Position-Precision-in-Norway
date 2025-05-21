@@ -184,7 +184,7 @@ def get_road_api(startpoint, sluttpoint, vegsystemreferanse):
             startveg = segmenter[0]
             # if 'sluttnode' in startveg:
             #     retning = 'MED'
-            if 'startnode' in startveg:
+            if 'sluttnode' in startveg:
                 retning = 'MOT'
                 segmenter.reverse()
 
