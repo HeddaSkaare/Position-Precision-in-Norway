@@ -153,7 +153,7 @@ def process_road_job(job_id, data):
 
         segmenter, df, vegsystemreferanse= get_road_api(startPoint, endPoint, vegReferanse)
         jobs[job_id]["progress"] = 50
-        road_utm, road_wgs = connect_total_road_segments(segmenter,df, vegsystemreferanse, startPoint, endPoint)
+        road_utm, road_wgs = connect_total_road_segments(segmenter,df, startPoint)
         jobs[job_id]["progress"] = 75
         points = calculate_travel_time(road_utm, float(distance))
         jobs[job_id]["progress"] = 90

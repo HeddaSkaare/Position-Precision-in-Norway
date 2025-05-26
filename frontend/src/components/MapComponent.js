@@ -151,7 +151,7 @@ const NavMap = () => {
                   });
               } else if (status.status === "error") {
                 clearInterval(interval);
-                alert("An error occures.Please Tyr again.");
+                alert("An error occures.Please try again.");
                 setUpdateRoad(false);
                 
               }

@@ -6,6 +6,7 @@ from pyproj import Transformer
 import requests
 import pandas as pd
 from shapely.geometry import LineString, Point
+from downloadfile import ensure_raster
 from downloadHoydedata import createNewRaster
 import nvdbapiv3 
 from flask import jsonify
@@ -199,9 +200,7 @@ def get_road_api(startpoint, sluttpoint, vegsystemreferanse):
 
         # Delete merged raster if exists
         print('lager raster')
-        if os.path.exists("data/merged_raster.tif"):
-            os.remove("data/merged_raster.tif")
-        createNewRaster(startpoint, sluttpoint)
+        ensure_raster()
         print('utav lager raster')
 
         return segmenter, df, vegsystemreferanse
@@ -210,7 +209,7 @@ def get_road_api(startpoint, sluttpoint, vegsystemreferanse):
         print(f"Error in get_road_api: {e}")
         raise  # let Flask catch and handle this
 
-def connect_total_road_segments(road_segments,fartsgrense_df, vegsystemreferanse, startpoint, sluttpoint):
+def connect_total_road_segments(road_segments,fartsgrense_df, startpoint):
     i = 0
     total_vegsegment_wgs84 = []
     total_vegsegment_utm = []
@@ -273,9 +272,7 @@ def connect_total_road_segments(road_segments,fartsgrense_df, vegsystemreferanse
     connected_utm = connect_road(total_vegsegment_utm)
     connected_wgs = connect_road(total_vegsegment_wgs84)
 
-    print('første segment', connected_utm[0]['geometry']['coordinates'][0])
-
-    return connected_utm,connected_wgs
+    return connected_utm, connected_wgs
 
 # eksempel url
 # https://nvdbapiles-v3.utv.atlas.vegvesen.no/beta/vegnett/rute?start=131363.978346842,6943393.145821838&slutt=136419.9895830073,6941862.632362077&maks_avstand=1000&omkrets=10&konnekteringslenker=true&detaljerte_lenker=true&behold_trafikantgruppe=false&pretty=true&kortform=false&vegsystemreferanse=EV136
