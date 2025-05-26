@@ -82,7 +82,6 @@ For å laste ned GNSS-ephemeris (RINEX/BRDC) fra [CDDIS (NASA's Crustal Dynamics
 
 1. Opprette en Earthdata-bruker
 2. Lage en `.netrc`-fil i hjemmemappen din
-3. Bruke `wget` eller `curl` for nedlasting
 
 ---
 
@@ -119,21 +118,6 @@ password passord
 chmod 600 ~/.netrc
 ```
 
----
 
-### 3. Last ned filer med `wget` eller `curl`
 
-#### Eksempel med `wget`:
-```bash
-wget --load-cookies ~/.urs_cookies --save-cookies ~/.urs_cookies --keep-session-cookies \
-https://cddis.nasa.gov/archive/gnss/data/daily/2024/brdc/brdc1230.24n.Z
-```
-
-- `--load-cookies` og `--save-cookies` trengs for autentisering
-- Du må kanskje pakke ut `.Z`-filene med `uncompress` etterpå:
-```bash
-uncompress brdc1230.24n.Z
-```
-
----
 
